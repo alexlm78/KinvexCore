@@ -101,3 +101,9 @@ src/
 3. Commit tus cambios (`git commit -am 'Añade nueva funcionalidad'`)
 4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
 5. Crea un Pull Request
+
+## Licencia
+
+Este proyecto está bajo la licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
+
+**Desarrollado por [Kreaker.dev](https://kreaker.dev)**

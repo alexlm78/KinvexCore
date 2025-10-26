@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025 Kreaker.dev
+ * Licensed under the MIT License
+ */
 package dev.kreaker.kinvex;
 
 import org.springframework.boot.SpringApplication;
