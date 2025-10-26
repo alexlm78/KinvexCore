@@ -1,9 +1,5 @@
 package dev.kreaker.kinvex.entity;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,6 +11,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "audit_logs")
@@ -59,8 +57,7 @@ public class AuditLog {
     private LocalDateTime createdAt;
 
     // Default constructor
-    public AuditLog() {
-    }
+    public AuditLog() {}
 
     // Constructor with required fields
     public AuditLog(String action, String entityType) {

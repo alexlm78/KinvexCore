@@ -1,15 +1,14 @@
 package dev.kreaker.kinvex.entity;
 
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class UserTest {
 
@@ -24,7 +23,8 @@ class UserTest {
     @Test
     void createUser_WithValidData_ShouldPass() {
         // Given
-        User user = new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
+        User user =
+                new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
 
         // When
         Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -73,7 +73,8 @@ class UserTest {
 
         // Then
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).contains("must be a well-formed email address");
+        assertThat(violations.iterator().next().getMessage())
+                .contains("must be a well-formed email address");
     }
 
     @Test
@@ -93,14 +94,17 @@ class UserTest {
     void createUser_WithTooLongUsername_ShouldFailValidation() {
         // Given
         String longUsername = "a".repeat(51); // Max is 50
-        User user = new User(longUsername, "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
+        User user =
+                new User(
+                        longUsername, "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
 
         // When
         Set<ConstraintViolation<User>> violations = validator.validate(user);
 
         // Then
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).contains("size must be between 0 and 50");
+        assertThat(violations.iterator().next().getMessage())
+                .contains("size must be between 0 and 50");
     }
 
     @Test
@@ -114,8 +118,9 @@ class UserTest {
 
         // Then
         assertThat(violations).hasSizeGreaterThanOrEqualTo(1);
-        boolean hasSizeViolation = violations.stream()
-                .anyMatch(v -> v.getMessage().contains("size must be between 0 and 100"));
+        boolean hasSizeViolation =
+                violations.stream()
+                        .anyMatch(v -> v.getMessage().contains("size must be between 0 and 100"));
         assertThat(hasSizeViolation).isTrue();
     }
 
@@ -123,8 +128,10 @@ class UserTest {
     void userRole_AllRoles_ShouldBeValid() {
         // Test all user roles
         User adminUser = new User("admin", "admin@example.com", "hash", User.UserRole.ADMIN);
-        User managerUser = new User("manager", "manager@example.com", "hash", User.UserRole.MANAGER);
-        User operatorUser = new User("operator", "operator@example.com", "hash", User.UserRole.OPERATOR);
+        User managerUser =
+                new User("manager", "manager@example.com", "hash", User.UserRole.MANAGER);
+        User operatorUser =
+                new User("operator", "operator@example.com", "hash", User.UserRole.OPERATOR);
         User viewerUser = new User("viewer", "viewer@example.com", "hash", User.UserRole.VIEWER);
 
         assertThat(adminUser.getRole()).isEqualTo(User.UserRole.ADMIN);

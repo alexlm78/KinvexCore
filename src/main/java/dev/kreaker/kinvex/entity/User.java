@@ -1,10 +1,5 @@
 package dev.kreaker.kinvex.entity;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,6 +11,9 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "users")
@@ -57,8 +55,7 @@ public class User {
     private LocalDateTime updatedAt;
 
     // Default constructor
-    public User() {
-    }
+    public User() {}
 
     // Constructor with required fields
     public User(String username, String email, String passwordHash, UserRole role) {

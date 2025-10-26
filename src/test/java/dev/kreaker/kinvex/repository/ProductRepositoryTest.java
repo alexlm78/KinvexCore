@@ -1,28 +1,25 @@
 package dev.kreaker.kinvex.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import dev.kreaker.kinvex.entity.Category;
+import dev.kreaker.kinvex.entity.Product;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 
-import dev.kreaker.kinvex.entity.Category;
-import dev.kreaker.kinvex.entity.Product;
-
 @DataJpaTest
 @ActiveProfiles("test")
 class ProductRepositoryTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
+    @Autowired private TestEntityManager entityManager;
 
-    @Autowired
-    private ProductRepository productRepository;
+    @Autowired private ProductRepository productRepository;
 
     @Test
     void findByCode_ShouldReturnProduct_WhenProductExists() {
@@ -50,13 +47,15 @@ class ProductRepositoryTest {
         Category category = new Category("Electronics");
         entityManager.persistAndFlush(category);
 
-        Product lowStockProduct = new Product("PROD001", "Low Stock Product", new BigDecimal("50.00"));
+        Product lowStockProduct =
+                new Product("PROD001", "Low Stock Product", new BigDecimal("50.00"));
         lowStockProduct.setCategory(category);
         lowStockProduct.setCurrentStock(5);
         lowStockProduct.setMinStock(10);
         entityManager.persistAndFlush(lowStockProduct);
 
-        Product normalStockProduct = new Product("PROD002", "Normal Stock Product", new BigDecimal("75.00"));
+        Product normalStockProduct =
+                new Product("PROD002", "Normal Stock Product", new BigDecimal("75.00"));
         normalStockProduct.setCategory(category);
         normalStockProduct.setCurrentStock(20);
         normalStockProduct.setMinStock(10);

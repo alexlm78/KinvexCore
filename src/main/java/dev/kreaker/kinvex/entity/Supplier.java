@@ -57,8 +57,7 @@ public class Supplier {
     private List<PurchaseOrder> purchaseOrders = new ArrayList<>();
 
     // Default constructor
-    public Supplier() {
-    }
+    public Supplier() {}
 
     // Constructor with required fields
     public Supplier(String name) {

@@ -43,8 +43,7 @@ public class Category {
     private List<Product> products = new ArrayList<>();
 
     // Default constructor
-    public Category() {
-    }
+    public Category() {}
 
     // Constructor with required fields
     public Category(String name) {

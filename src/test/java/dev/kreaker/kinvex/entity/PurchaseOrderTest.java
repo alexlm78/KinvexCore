@@ -1,17 +1,16 @@
 package dev.kreaker.kinvex.entity;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class PurchaseOrderTest {
 
@@ -25,8 +24,10 @@ class PurchaseOrderTest {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
 
-        testSupplier = new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
-        testUser = new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
+        testSupplier =
+                new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
+        testUser =
+                new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
         testProduct = new Product("PROD001", "Test Product", new BigDecimal("99.99"));
     }
 
@@ -35,7 +36,8 @@ class PurchaseOrderTest {
         // Given
         LocalDate orderDate = LocalDate.now();
         LocalDate expectedDate = LocalDate.now().plusDays(7);
-        PurchaseOrder order = new PurchaseOrder("PO001", testSupplier, orderDate, expectedDate, testUser);
+        PurchaseOrder order =
+                new PurchaseOrder("PO001", testSupplier, orderDate, expectedDate, testUser);
 
         // When
         Set<ConstraintViolation<PurchaseOrder>> violations = validator.validate(order);

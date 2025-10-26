@@ -1,16 +1,15 @@
 package dev.kreaker.kinvex.entity;
 
-import java.math.BigDecimal;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import java.math.BigDecimal;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class CategoryTest {
 
@@ -60,7 +59,8 @@ class CategoryTest {
 
         // Then
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).contains("size must be between 0 and 50");
+        assertThat(violations.iterator().next().getMessage())
+                .contains("size must be between 0 and 50");
     }
 
     @Test
@@ -74,7 +74,8 @@ class CategoryTest {
 
         // Then
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).contains("size must be between 0 and 500");
+        assertThat(violations.iterator().next().getMessage())
+                .contains("size must be between 0 and 500");
     }
 
     @Test

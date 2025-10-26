@@ -74,8 +74,7 @@ public class PurchaseOrder {
     private List<OrderDetail> orderDetails = new ArrayList<>();
 
     // Default constructor
-    public PurchaseOrder() {
-    }
+    public PurchaseOrder() {}
 
     // Constructor with required fields
     public PurchaseOrder(String orderNumber, Supplier supplier, LocalDate orderDate) {
@@ -209,8 +208,8 @@ public class PurchaseOrder {
     }
 
     public void calculateTotalAmount() {
-        this.totalAmount
-                = orderDetails.stream()
+        this.totalAmount =
+                orderDetails.stream()
                         .map(OrderDetail::getTotalPrice)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -228,8 +227,7 @@ public class PurchaseOrder {
     }
 
     public boolean isPartiallyReceived() {
-        return orderDetails.stream()
-                .anyMatch(detail -> detail.getQuantityReceived() > 0)
+        return orderDetails.stream().anyMatch(detail -> detail.getQuantityReceived() > 0)
                 && !isFullyReceived();
     }
 

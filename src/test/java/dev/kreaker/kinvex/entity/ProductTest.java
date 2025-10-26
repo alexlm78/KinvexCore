@@ -1,17 +1,16 @@
 package dev.kreaker.kinvex.entity;
 
-import java.math.BigDecimal;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import java.math.BigDecimal;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ProductTest {
 
@@ -107,7 +106,8 @@ class ProductTest {
 
         // Then
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).contains("must be greater than or equal to 0");
+        assertThat(violations.iterator().next().getMessage())
+                .contains("must be greater than or equal to 0");
     }
 
     @Test

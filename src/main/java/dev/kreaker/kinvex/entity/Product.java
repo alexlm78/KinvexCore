@@ -83,8 +83,7 @@ public class Product {
     private List<InventoryMovement> inventoryMovements = new ArrayList<>();
 
     // Default constructor
-    public Product() {
-    }
+    public Product() {}
 
     // Constructor with required fields
     public Product(String code, String name, BigDecimal unitPrice) {

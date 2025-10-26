@@ -1,39 +1,38 @@
 package dev.kreaker.kinvex.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import dev.kreaker.kinvex.entity.PurchaseOrder;
+import dev.kreaker.kinvex.entity.Supplier;
+import dev.kreaker.kinvex.entity.User;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 
-import dev.kreaker.kinvex.entity.PurchaseOrder;
-import dev.kreaker.kinvex.entity.Supplier;
-import dev.kreaker.kinvex.entity.User;
-
 @DataJpaTest
 @ActiveProfiles("test")
 class PurchaseOrderRepositoryTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
+    @Autowired private TestEntityManager entityManager;
 
-    @Autowired
-    private PurchaseOrderRepository purchaseOrderRepository;
+    @Autowired private PurchaseOrderRepository purchaseOrderRepository;
 
     @Test
     void findByOrderNumber_ShouldReturnOrder_WhenOrderExists() {
         // Given
-        Supplier supplier = new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
+        Supplier supplier =
+                new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
         entityManager.persistAndFlush(supplier);
 
-        User user = new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
+        User user =
+                new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
         entityManager.persistAndFlush(user);
 
         PurchaseOrder order = new PurchaseOrder("PO001", supplier, LocalDate.now());
@@ -53,10 +52,12 @@ class PurchaseOrderRepositoryTest {
     @Test
     void findByStatus_ShouldReturnOrdersWithSpecificStatus() {
         // Given
-        Supplier supplier = new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
+        Supplier supplier =
+                new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
         entityManager.persistAndFlush(supplier);
 
-        User user = new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
+        User user =
+                new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
         entityManager.persistAndFlush(user);
 
         PurchaseOrder pendingOrder = new PurchaseOrder("PO001", supplier, LocalDate.now());
@@ -70,7 +71,8 @@ class PurchaseOrderRepositoryTest {
         entityManager.persistAndFlush(completedOrder);
 
         // When
-        List<PurchaseOrder> pendingOrders = purchaseOrderRepository.findByStatus(PurchaseOrder.OrderStatus.PENDING);
+        List<PurchaseOrder> pendingOrders =
+                purchaseOrderRepository.findByStatus(PurchaseOrder.OrderStatus.PENDING);
 
         // Then
         assertThat(pendingOrders).hasSize(1);
@@ -81,14 +83,17 @@ class PurchaseOrderRepositoryTest {
     @Test
     void findOverdueOrders_ShouldReturnOverdueOrders() {
         // Given
-        Supplier supplier = new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
+        Supplier supplier =
+                new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
         entityManager.persistAndFlush(supplier);
 
-        User user = new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
+        User user =
+                new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
         entityManager.persistAndFlush(user);
 
         // Create overdue order
-        PurchaseOrder overdueOrder = new PurchaseOrder("PO001", supplier, LocalDate.now().minusDays(10));
+        PurchaseOrder overdueOrder =
+                new PurchaseOrder("PO001", supplier, LocalDate.now().minusDays(10));
         overdueOrder.setExpectedDate(LocalDate.now().minusDays(2));
         overdueOrder.setStatus(PurchaseOrder.OrderStatus.PENDING);
         overdueOrder.setCreatedBy(user);
@@ -112,10 +117,12 @@ class PurchaseOrderRepositoryTest {
     @Test
     void findOrdersDueSoon_ShouldReturnOrdersDueWithinTimeframe() {
         // Given
-        Supplier supplier = new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
+        Supplier supplier =
+                new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
         entityManager.persistAndFlush(supplier);
 
-        User user = new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
+        User user =
+                new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
         entityManager.persistAndFlush(user);
 
         // Create order due soon
@@ -133,7 +140,8 @@ class PurchaseOrderRepositoryTest {
         entityManager.persistAndFlush(dueLaterOrder);
 
         // When
-        List<PurchaseOrder> ordersDueSoon = purchaseOrderRepository.findOrdersDueSoon(LocalDate.now().plusDays(5));
+        List<PurchaseOrder> ordersDueSoon =
+                purchaseOrderRepository.findOrdersDueSoon(LocalDate.now().plusDays(5));
 
         // Then
         assertThat(ordersDueSoon).hasSize(1);
@@ -143,10 +151,12 @@ class PurchaseOrderRepositoryTest {
     @Test
     void findOrderStatisticsBetween_ShouldReturnCorrectStatistics() {
         // Given
-        Supplier supplier = new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
+        Supplier supplier =
+                new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
         entityManager.persistAndFlush(supplier);
 
-        User user = new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
+        User user =
+                new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
         entityManager.persistAndFlush(user);
 
         LocalDateTime startDate = LocalDateTime.now().minusDays(7);
@@ -166,16 +176,18 @@ class PurchaseOrderRepositoryTest {
         entityManager.persistAndFlush(completedOrder);
 
         // When
-        List<Object[]> statistics = purchaseOrderRepository.findOrderStatisticsBetween(startDate, endDate);
+        List<Object[]> statistics =
+                purchaseOrderRepository.findOrderStatisticsBetween(startDate, endDate);
 
         // Then
         assertThat(statistics).hasSize(2);
 
         // Find the PENDING status statistics
-        Object[] pendingStats = statistics.stream()
-                .filter(stat -> stat[0] == PurchaseOrder.OrderStatus.PENDING)
-                .findFirst()
-                .orElse(null);
+        Object[] pendingStats =
+                statistics.stream()
+                        .filter(stat -> stat[0] == PurchaseOrder.OrderStatus.PENDING)
+                        .findFirst()
+                        .orElse(null);
 
         assertThat(pendingStats).isNotNull();
         assertThat(pendingStats[1]).isEqualTo(1L); // count
@@ -185,10 +197,12 @@ class PurchaseOrderRepositoryTest {
     @Test
     void countByStatus_ShouldReturnCorrectCount() {
         // Given
-        Supplier supplier = new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
+        Supplier supplier =
+                new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
         entityManager.persistAndFlush(supplier);
 
-        User user = new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
+        User user =
+                new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
         entityManager.persistAndFlush(user);
 
         // Create multiple pending orders
@@ -206,8 +220,10 @@ class PurchaseOrderRepositoryTest {
         entityManager.persistAndFlush(completedOrder);
 
         // When
-        long pendingCount = purchaseOrderRepository.countByStatus(PurchaseOrder.OrderStatus.PENDING);
-        long completedCount = purchaseOrderRepository.countByStatus(PurchaseOrder.OrderStatus.COMPLETED);
+        long pendingCount =
+                purchaseOrderRepository.countByStatus(PurchaseOrder.OrderStatus.PENDING);
+        long completedCount =
+                purchaseOrderRepository.countByStatus(PurchaseOrder.OrderStatus.COMPLETED);
 
         // Then
         assertThat(pendingCount).isEqualTo(3);
@@ -217,10 +233,12 @@ class PurchaseOrderRepositoryTest {
     @Test
     void existsByOrderNumber_ShouldReturnTrue_WhenOrderExists() {
         // Given
-        Supplier supplier = new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
+        Supplier supplier =
+                new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
         entityManager.persistAndFlush(supplier);
 
-        User user = new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
+        User user =
+                new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
         entityManager.persistAndFlush(user);
 
         PurchaseOrder order = new PurchaseOrder("PO001", supplier, LocalDate.now());

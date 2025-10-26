@@ -1,9 +1,5 @@
 package dev.kreaker.kinvex.entity;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,6 +13,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "inventory_movements")
@@ -64,8 +62,7 @@ public class InventoryMovement {
     private LocalDateTime createdAt;
 
     // Default constructor
-    public InventoryMovement() {
-    }
+    public InventoryMovement() {}
 
     // Constructor with required fields
     public InventoryMovement(Product product, MovementType movementType, Integer quantity) {
