@@ -13,5 +13,4 @@ public class KinvexCoreApplication {
     public static void main(String[] args) {
         SpringApplication.run(KinvexCoreApplication.class, args);
     }
-
 }

@@ -1,11 +1,23 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.0'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.springframework.boot' version '3.5.7'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.diffplug.spotless' version '8.0.0'
 }
 
+group = 'dev.kreaker'
+version = '0.0.1'
+
 java {
-    sourceCompatibility = '21'
+   toolchain {
+      languageVersion = JavaLanguageVersion.of(21)
+   }
+}
+
+configurations {
+   compileOnly {
+      extendsFrom annotationProcessor
+   }
 }
 
 repositories {
@@ -23,6 +35,7 @@ dependencies {
     // Database
     implementation 'org.postgresql:postgresql'
     implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
 
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
@@ -47,4 +60,126 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+spotless {
+   java {
+      target '**/*.java'
+      targetExclude '**/build/**', '**/.gradle/**', 'out/**'
+
+      googleJavaFormat('1.24.0').aosp()
+      trimTrailingWhitespace()
+      endWithNewline()
+      leadingTabsToSpaces(4)
+
+      custom 'noWildcardImports', {
+         if (it.contains('import .*\\*')) {
+            throw new RuntimeException('No use wildcard imports')
+         }
+      }
+
+      custom 'enforceUtf8', {
+         return new String(it.getBytes('UTF-8'), 'UTF-8')
+      }
+   }
+
+   format 'properties', {
+      target '**/*.properties'
+      targetExclude '**/build/**', '**/.gradle/**', 'out/**'
+
+      trimTrailingWhitespace()
+      endWithNewline()
+      leadingTabsToSpaces(2)
+
+      // Sort properties alphabetically
+      custom 'sortProperties', { content ->
+         def lines = content.readLines()
+         def result = []
+         def commentBlock = []
+         def propBlock = []
+
+         lines.each { line ->
+            def trimmed = line.trim()
+            if (trimmed.startsWith('#') || trimmed.isEmpty()) {
+               if (!propBlock.isEmpty()) {
+                  result.addAll(propBlock.sort { a, b ->
+                     def keyA = a.split('=')[0].trim()
+                     def keyB = b.split('=')[0].trim()
+                     return keyA.compareToIgnoreCase(keyB)
+                  })
+                  propBlock.clear()
+               }
+               result.add(line)
+            } else {
+               propBlock.add(line)
+            }
+         }
+
+         if (!propBlock.isEmpty()) {
+            result.addAll(propBlock.sort { a, b ->
+               def keyA = a.split('=')[0].trim()
+               def keyB = b.split('=')[0].trim()
+               return keyA.compareToIgnoreCase(keyB)
+            })
+         }
+
+         return result.join('\n')
+      }
+   }
+
+   // YAML files (Spring Boot configs)
+   format 'yaml', {
+      target '**/*.yml', '**/*.yaml'
+      targetExclude '**/build/**'
+
+      trimTrailingWhitespace()
+      endWithNewline()
+      leadingTabsToSpaces(2)
+   }
+
+   // XML files (Maven, Spring configs)
+   format 'xml', {
+      target '**/*.xml'
+      targetExclude '**/build/**'
+
+      eclipseWtp('xml')
+      trimTrailingWhitespace()
+      endWithNewline()
+      leadingTabsToSpaces(2)
+   }
+
+   // Additional formats
+   format 'misc', {
+      target '**/*.md', '**/*.gitignore'
+      trimTrailingWhitespace()
+      endWithNewline()
+      leadingTabsToSpaces(3)
+   }
+}
+
+// Custom tasks for IDE integration
+task formatJava {
+   group 'formatting'
+   description 'Format only Java files'
+   doLast {
+      exec {
+         commandLine './gradlew', 'spotlessJavaApply'
+      }
+   }
+}
+
+task formatProperties {
+   group 'formatting'
+   description 'Format only Properties files'
+   doLast {
+      exec {
+         commandLine './gradlew', 'spotlessPropertiesApply'
+      }
+   }
+}
+
+task formatAll {
+   group 'formatting'
+   description 'Format all supported files'
+   dependsOn 'spotlessApply'
 }

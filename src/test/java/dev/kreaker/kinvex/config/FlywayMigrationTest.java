@@ -1,6 +1,7 @@
 package dev.kreaker.kinvex.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,18 +13,19 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
- * Test de integración para verificar que las migraciones Flyway funcionan
- * correctamente con una base de datos PostgreSQL real usando TestContainers.
+ * Test de integración para verificar que las migraciones Flyway funcionan correctamente con una
+ * base de datos PostgreSQL real usando TestContainers.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Testcontainers
 class FlywayMigrationTest {
 
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
-            .withDatabaseName("kinvex_test")
-            .withUsername("test")
-            .withPassword("test");
+    static PostgreSQLContainer<?> postgres =
+            new PostgreSQLContainer<>("postgres:15-alpine")
+                    .withDatabaseName("kinvex_test")
+                    .withUsername("test")
+                    .withPassword("test");
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -34,7 +36,10 @@ class FlywayMigrationTest {
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "validate");
 
         // JWT configuration for testing
-        registry.add("jwt.secret", () -> "dGVzdC1zZWNyZXQta2V5LWZvci1qd3QtdGVzdGluZy1tdXN0LWJlLWF0LWxlYXN0LTI1Ni1iaXRz");
+        registry.add(
+                "jwt.secret",
+                () ->
+                        "dGVzdC1zZWNyZXQta2V5LWZvci1qd3QtdGVzdGluZy1tdXN0LWJlLWF0LWxlYXN0LTI1Ni1iaXRz");
         registry.add("jwt.expiration", () -> "3600");
         registry.add("jwt.refresh-expiration", () -> "86400");
         registry.add("jwt.issuer", () -> "kinvex-test");
@@ -45,8 +50,7 @@ class FlywayMigrationTest {
         registry.add("spring.cache.type", () -> "none");
     }
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
     @Test
     void testFlywayMigrationsExecuted() {
@@ -64,49 +68,53 @@ class FlywayMigrationTest {
     @Test
     void testInitialDataInserted() {
         // Verificar que los datos iniciales fueron insertados
-        Integer userCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM users", Integer.class);
+        Integer userCount =
+                jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
         assertThat(userCount).isGreaterThan(0);
 
-        Integer categoryCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM categories", Integer.class);
+        Integer categoryCount =
+                jdbcTemplate.queryForObject("SELECT COUNT(*) FROM categories", Integer.class);
         assertThat(categoryCount).isGreaterThan(0);
 
-        Integer supplierCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM suppliers", Integer.class);
+        Integer supplierCount =
+                jdbcTemplate.queryForObject("SELECT COUNT(*) FROM suppliers", Integer.class);
         assertThat(supplierCount).isGreaterThan(0);
 
-        Integer productCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM products", Integer.class);
+        Integer productCount =
+                jdbcTemplate.queryForObject("SELECT COUNT(*) FROM products", Integer.class);
         assertThat(productCount).isGreaterThan(0);
     }
 
     @Test
     void testDatabaseConstraints() {
         // Verificar que las restricciones de integridad funcionan
-        Integer adminUserCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM users WHERE role = 'ADMIN'", Integer.class);
+        Integer adminUserCount =
+                jdbcTemplate.queryForObject(
+                        "SELECT COUNT(*) FROM users WHERE role = 'ADMIN'", Integer.class);
         assertThat(adminUserCount).isGreaterThan(0);
 
         // Verificar que los productos tienen códigos únicos
-        Integer uniqueProductCodes = jdbcTemplate.queryForObject(
-                "SELECT COUNT(DISTINCT code) FROM products", Integer.class);
-        Integer totalProducts = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM products", Integer.class);
+        Integer uniqueProductCodes =
+                jdbcTemplate.queryForObject(
+                        "SELECT COUNT(DISTINCT code) FROM products", Integer.class);
+        Integer totalProducts =
+                jdbcTemplate.queryForObject("SELECT COUNT(*) FROM products", Integer.class);
         assertThat(uniqueProductCodes).isEqualTo(totalProducts);
     }
 
     @Test
     void testForeignKeyRelationships() {
         // Verificar que las relaciones de clave foránea funcionan
-        Integer productsWithCategories = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM products p INNER JOIN categories c ON p.category_id = c.id",
-                Integer.class);
+        Integer productsWithCategories =
+                jdbcTemplate.queryForObject(
+                        "SELECT COUNT(*) FROM products p INNER JOIN categories c ON p.category_id = c.id",
+                        Integer.class);
         assertThat(productsWithCategories).isGreaterThan(0);
 
-        Integer movementsWithProducts = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM inventory_movements im INNER JOIN products p ON im.product_id = p.id",
-                Integer.class);
+        Integer movementsWithProducts =
+                jdbcTemplate.queryForObject(
+                        "SELECT COUNT(*) FROM inventory_movements im INNER JOIN products p ON im.product_id = p.id",
+                        Integer.class);
         assertThat(movementsWithProducts).isGreaterThan(0);
     }
 
@@ -114,7 +122,8 @@ class FlywayMigrationTest {
         try {
             jdbcTemplate.queryForObject(
                     "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = ?",
-                    Integer.class, tableName);
+                    Integer.class,
+                    tableName);
             return true;
         } catch (Exception e) {
             return false;

@@ -1,19 +1,16 @@
 package dev.kreaker.kinvex.security;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import dev.kreaker.kinvex.config.JwtProperties;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import dev.kreaker.kinvex.config.JwtProperties;
-
-/**
- * Tests unitarios para JwtTokenProvider
- */
+/** Tests unitarios para JwtTokenProvider */
 class JwtTokenProviderTest {
 
     private JwtTokenProvider jwtTokenProvider;
@@ -22,13 +19,13 @@ class JwtTokenProviderTest {
     @BeforeEach
     void setUp() {
         // Configurar propiedades JWT para testing
-        jwtProperties = new JwtProperties(
-                "dGVzdC1zZWNyZXQta2V5LWZvci1qd3QtdGVzdGluZy1tdXN0LWJlLWF0LWxlYXN0LTI1Ni1iaXRz", // base64 encoded test secret
-                3600L,
-                86400L,
-                "kinvex-test",
-                "kinvex-test-users"
-        );
+        jwtProperties =
+                new JwtProperties(
+                        "dGVzdC1zZWNyZXQta2V5LWZvci1qd3QtdGVzdGluZy1tdXN0LWJlLWF0LWxlYXN0LTI1Ni1iaXRz", // base64 encoded test secret
+                        3600L,
+                        86400L,
+                        "kinvex-test",
+                        "kinvex-test-users");
         jwtTokenProvider = new JwtTokenProvider(jwtProperties);
     }
 
@@ -74,13 +71,13 @@ class JwtTokenProviderTest {
     @Test
     void shouldRejectExpiredToken() {
         // Given - crear propiedades con expiración muy corta
-        JwtProperties shortExpiryProps = new JwtProperties(
-                jwtProperties.secret(),
-                -1L, // Token ya expirado
-                86400L,
-                jwtProperties.issuer(),
-                jwtProperties.audience()
-        );
+        JwtProperties shortExpiryProps =
+                new JwtProperties(
+                        jwtProperties.secret(),
+                        -1L, // Token ya expirado
+                        86400L,
+                        jwtProperties.issuer(),
+                        jwtProperties.audience());
         JwtTokenProvider shortExpiryProvider = new JwtTokenProvider(shortExpiryProps);
 
         String username = "testuser";

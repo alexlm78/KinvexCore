@@ -1,7 +1,8 @@
 package dev.kreaker.kinvex.config;
 
+import dev.kreaker.kinvex.security.JwtAuthenticationEntryPoint;
+import dev.kreaker.kinvex.security.JwtAuthenticationFilter;
 import java.util.Arrays;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,12 +19,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import dev.kreaker.kinvex.security.JwtAuthenticationEntryPoint;
-import dev.kreaker.kinvex.security.JwtAuthenticationFilter;
-
 /**
- * Configuración principal de seguridad para el sistema Kinvex. Define las
- * reglas de autenticación, autorización, CORS y JWT.
+ * Configuración principal de seguridad para el sistema Kinvex. Define las reglas de autenticación,
+ * autorización, CORS y JWT.
  */
 @Configuration
 @EnableWebSecurity
@@ -37,16 +35,13 @@ public class SecurityConfig {
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter,
             JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-            CorsProperties corsProperties
-    ) {
+            CorsProperties corsProperties) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.corsProperties = corsProperties;
     }
 
-    /**
-     * Configuración principal de la cadena de filtros de seguridad
-     */
+    /** Configuración principal de la cadena de filtros de seguridad */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -55,59 +50,66 @@ public class SecurityConfig {
                 // Configurar CORS
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 // Configurar manejo de sesiones como stateless
-                .sessionManagement(session
-                        -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // Configurar punto de entrada para errores de autenticación
-                .exceptionHandling(exceptions
-                        -> exceptions.authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                )
+                .exceptionHandling(
+                        exceptions ->
+                                exceptions.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 // Configurar reglas de autorización
-                .authorizeHttpRequests(auth -> auth
-                // Endpoints públicos - no requieren autenticación
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers("/actuator/info").permitAll()
-                .requestMatchers("/swagger-ui/**").permitAll()
-                .requestMatchers("/v3/api-docs/**").permitAll()
-                .requestMatchers("/swagger-resources/**").permitAll()
-                .requestMatchers("/webjars/**").permitAll()
-                // Endpoints de inventario - requieren autenticación
-                .requestMatchers(HttpMethod.GET, "/api/inventory/**")
-                .hasAnyRole("VIEWER", "OPERATOR", "MANAGER", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/inventory/**")
-                .hasAnyRole("OPERATOR", "MANAGER", "ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/inventory/**")
-                .hasAnyRole("OPERATOR", "MANAGER", "ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/inventory/**")
-                .hasAnyRole("MANAGER", "ADMIN")
-                // Endpoints de órdenes - requieren autenticación
-                .requestMatchers(HttpMethod.GET, "/api/orders/**")
-                .hasAnyRole("VIEWER", "OPERATOR", "MANAGER", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/orders/**")
-                .hasAnyRole("OPERATOR", "MANAGER", "ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/orders/**")
-                .hasAnyRole("OPERATOR", "MANAGER", "ADMIN")
-                // Endpoints de reportes - solo managers y admins
-                .requestMatchers("/api/reports/**")
-                .hasAnyRole("MANAGER", "ADMIN")
-                // Endpoints de administración - solo admins
-                .requestMatchers("/api/admin/**")
-                .hasRole("ADMIN")
-                // Endpoints de actuator protegidos
-                .requestMatchers("/actuator/**")
-                .hasRole("ADMIN")
-                // Cualquier otra request requiere autenticación
-                .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(
+                        auth ->
+                                auth
+                                        // Endpoints públicos - no requieren autenticación
+                                        .requestMatchers("/api/auth/**")
+                                        .permitAll()
+                                        .requestMatchers("/actuator/health")
+                                        .permitAll()
+                                        .requestMatchers("/actuator/info")
+                                        .permitAll()
+                                        .requestMatchers("/swagger-ui/**")
+                                        .permitAll()
+                                        .requestMatchers("/v3/api-docs/**")
+                                        .permitAll()
+                                        .requestMatchers("/swagger-resources/**")
+                                        .permitAll()
+                                        .requestMatchers("/webjars/**")
+                                        .permitAll()
+                                        // Endpoints de inventario - requieren autenticación
+                                        .requestMatchers(HttpMethod.GET, "/api/inventory/**")
+                                        .hasAnyRole("VIEWER", "OPERATOR", "MANAGER", "ADMIN")
+                                        .requestMatchers(HttpMethod.POST, "/api/inventory/**")
+                                        .hasAnyRole("OPERATOR", "MANAGER", "ADMIN")
+                                        .requestMatchers(HttpMethod.PUT, "/api/inventory/**")
+                                        .hasAnyRole("OPERATOR", "MANAGER", "ADMIN")
+                                        .requestMatchers(HttpMethod.DELETE, "/api/inventory/**")
+                                        .hasAnyRole("MANAGER", "ADMIN")
+                                        // Endpoints de órdenes - requieren autenticación
+                                        .requestMatchers(HttpMethod.GET, "/api/orders/**")
+                                        .hasAnyRole("VIEWER", "OPERATOR", "MANAGER", "ADMIN")
+                                        .requestMatchers(HttpMethod.POST, "/api/orders/**")
+                                        .hasAnyRole("OPERATOR", "MANAGER", "ADMIN")
+                                        .requestMatchers(HttpMethod.PUT, "/api/orders/**")
+                                        .hasAnyRole("OPERATOR", "MANAGER", "ADMIN")
+                                        // Endpoints de reportes - solo managers y admins
+                                        .requestMatchers("/api/reports/**")
+                                        .hasAnyRole("MANAGER", "ADMIN")
+                                        // Endpoints de administración - solo admins
+                                        .requestMatchers("/api/admin/**")
+                                        .hasRole("ADMIN")
+                                        // Endpoints de actuator protegidos
+                                        .requestMatchers("/actuator/**")
+                                        .hasRole("ADMIN")
+                                        // Cualquier otra request requiere autenticación
+                                        .anyRequest()
+                                        .authenticated())
                 // Agregar el filtro JWT antes del filtro de autenticación estándar
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(
+                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
-    /**
-     * Configuración de CORS basada en las propiedades de la aplicación
-     */
+    /** Configuración de CORS basada en las propiedades de la aplicación */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -128,12 +130,8 @@ public class SecurityConfig {
         configuration.setMaxAge(corsProperties.maxAge());
 
         // Headers que el cliente puede acceder
-        configuration.setExposedHeaders(Arrays.asList(
-                "Authorization",
-                "Content-Type",
-                "X-Total-Count",
-                "X-Total-Pages"
-        ));
+        configuration.setExposedHeaders(
+                Arrays.asList("Authorization", "Content-Type", "X-Total-Count", "X-Total-Pages"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -141,9 +139,7 @@ public class SecurityConfig {
         return source;
     }
 
-    /**
-     * Bean para el encoder de contraseñas usando BCrypt
-     */
+    /** Bean para el encoder de contraseñas usando BCrypt */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12); // Usar strength 12 para mayor seguridad

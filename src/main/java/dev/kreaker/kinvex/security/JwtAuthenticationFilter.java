@@ -1,8 +1,11 @@
 package dev.kreaker.kinvex.security;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,14 +14,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 /**
- * Filtro de autenticación JWT que intercepta todas las requests HTTP para
- * validar y procesar tokens JWT en el header Authorization.
+ * Filtro de autenticación JWT que intercepta todas las requests HTTP para validar y procesar tokens
+ * JWT en el header Authorization.
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -33,8 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
+            @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
 
@@ -55,17 +53,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 List<String> roles = jwtTokenProvider.getRolesFromToken(jwt);
 
                 // Crear authorities de Spring Security
-                List<SimpleGrantedAuthority> authorities = roles.stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .toList();
+                List<SimpleGrantedAuthority> authorities =
+                        roles.stream()
+                                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                                .toList();
 
                 // Crear el objeto de autenticación
-                UsernamePasswordAuthenticationToken authToken
-                        = new UsernamePasswordAuthenticationToken(
-                                username,
-                                null,
-                                authorities
-                        );
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(username, null, authorities);
 
                 // Establecer detalles adicionales de la request
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
