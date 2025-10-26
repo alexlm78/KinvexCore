@@ -56,6 +56,57 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
+    /** Maneja excepciones de producto no encontrado. */
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProductNotFoundException(
+            ProductNotFoundException ex, WebRequest request) {
+
+        logger.warn("Producto no encontrado: {}", ex.getMessage());
+
+        ErrorResponse errorResponse =
+                new ErrorResponse(
+                        "PRODUCT_NOT_FOUND",
+                        ex.getMessage(),
+                        LocalDateTime.now(),
+                        request.getDescription(false));
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    /** Maneja excepciones de stock insuficiente. */
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientStockException(
+            InsufficientStockException ex, WebRequest request) {
+
+        logger.warn("Stock insuficiente: {}", ex.getMessage());
+
+        ErrorResponse errorResponse =
+                new ErrorResponse(
+                        "INSUFFICIENT_STOCK",
+                        ex.getMessage(),
+                        LocalDateTime.now(),
+                        request.getDescription(false));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /** Maneja excepciones de código de producto duplicado. */
+    @ExceptionHandler(DuplicateProductCodeException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateProductCodeException(
+            DuplicateProductCodeException ex, WebRequest request) {
+
+        logger.warn("Código de producto duplicado: {}", ex.getMessage());
+
+        ErrorResponse errorResponse =
+                new ErrorResponse(
+                        "DUPLICATE_PRODUCT_CODE",
+                        ex.getMessage(),
+                        LocalDateTime.now(),
+                        request.getDescription(false));
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
     /** Maneja errores de validación de datos de entrada. */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(
