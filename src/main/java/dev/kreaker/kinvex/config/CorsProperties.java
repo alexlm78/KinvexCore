@@ -27,11 +27,25 @@ public record CorsProperties(
             Long maxAge
     ) {
         this(
-                allowedOrigins != null ? allowedOrigins : List.of("http://localhost:3000"),
-                allowedMethods != null ? allowedMethods : List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"),
-                allowedHeaders != null ? allowedHeaders : List.of("*"),
+                allowedOrigins != null && !allowedOrigins.isEmpty()
+                ? allowedOrigins : List.of("http://localhost:3000"),
+                allowedMethods != null && !allowedMethods.isEmpty()
+                ? parseCommaSeparated(allowedMethods.get(0))
+                : List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"),
+                allowedHeaders != null && !allowedHeaders.isEmpty()
+                ? allowedHeaders : List.of("*"),
                 allowCredentials != null ? allowCredentials : true,
                 maxAge != null ? maxAge : 3600L
         );
+    }
+
+    /**
+     * Parsea una cadena separada por comas en una lista
+     */
+    private static List<String> parseCommaSeparated(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return List.of();
+        }
+        return List.of(value.split(","));
     }
 }
