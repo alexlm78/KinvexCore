@@ -1,12 +1,22 @@
+# Configuración base para todos los perfiles
 spring:
   application:
     name: kinvex-core
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:kinvex}
     username: ${DB_USERNAME:kinvex_user}
     password: ${DB_PASSWORD:kinvex_password}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
 
   jpa:
     hibernate:
@@ -16,17 +26,34 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        jdbc:
+          "[batch_size]": 20
+        "[order_inserts]": true
+        "[order_updates]": true
 
   flyway:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
+    validate-on-migrate: true
 
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
-      timeout: 2000ms
+      timeout: ${REDIS_TIMEOUT:2000ms}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+      jedis:
+        pool:
+          max-active: ${REDIS_POOL_MAX_ACTIVE:8}
+          max-idle: ${REDIS_POOL_MAX_IDLE:8}
+          min-idle: ${REDIS_POOL_MIN_IDLE:0}
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: ${CACHE_TTL:3600000}
 
   security:
     oauth2:
@@ -36,30 +63,63 @@ spring:
 
 server:
   port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${CONTEXT_PATH:/}
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+  error:
+    include-message: always
+    include-binding-errors: always
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
+      base-path: /actuator
   endpoint:
     health:
       show-details: when-authorized
+      show-components: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
+# Configuración JWT
 jwt:
-  secret: ${JWT_SECRET:your-secret-key-change-in-production}
+  secret: ${JWT_SECRET:your-secret-key-change-in-production-must-be-at-least-256-bits}
   expiration: ${JWT_EXPIRATION:3600}
   refresh-expiration: ${JWT_REFRESH_EXPIRATION:86400}
+  issuer: ${JWT_ISSUER:kinvex-system}
+  audience: ${JWT_AUDIENCE:kinvex-users}
 
+# Configuración CORS
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
-  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
-  allowed-headers: "*"
-  allow-credentials: true
+  allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS,PATCH}
+  allowed-headers: ${CORS_ALLOWED_HEADERS:*}
+  allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
+  max-age: ${CORS_MAX_AGE:3600}
 
+# Configuración de la aplicación
+app:
+  name: Kinvex Inventory System
+  version: ${APP_VERSION:1.0.0}
+  description: Sistema de Gestión de Inventario Empresarial
+  contact:
+    name: ${APP_CONTACT_NAME:Kinvex Team}
+    email: ${APP_CONTACT_EMAIL:support@kinvex.com}
+
+# Configuración de logging base
 logging:
   level:
     dev.kreaker.kinvex: INFO
-    org.springframework.security: DEBUG
+    org.springframework.security: WARN
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
