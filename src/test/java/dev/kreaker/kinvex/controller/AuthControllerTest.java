@@ -5,9 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -29,7 +31,9 @@ import dev.kreaker.kinvex.service.AuthService;
  * Tests de integración para AuthController. Verifica que los endpoints de
  * autenticación funcionen correctamente.
  */
-@WebMvcTest(AuthController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class AuthControllerTest {
 
     @Autowired
@@ -45,15 +49,19 @@ class AuthControllerTest {
     void login_WithValidCredentials_ShouldReturnAuthResponse() throws Exception {
         // Given
         LoginRequest loginRequest = new LoginRequest("testuser", "password123");
-        AuthResponse.UserInfo userInfo = new AuthResponse.UserInfo(1L, "testuser", "test@example.com", User.UserRole.OPERATOR);
-        AuthResponse authResponse = new AuthResponse("access-token", "refresh-token", 3600L, userInfo);
+        AuthResponse.UserInfo userInfo
+                = new AuthResponse.UserInfo(
+                        1L, "testuser", "test@example.com", User.UserRole.OPERATOR);
+        AuthResponse authResponse
+                = new AuthResponse("access-token", "refresh-token", 3600L, userInfo);
 
         when(authService.login(any(LoginRequest.class))).thenReturn(authResponse);
 
         // When & Then
-        mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
+        mockMvc.perform(
+                post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.accessToken").value("access-token"))
@@ -75,9 +83,10 @@ class AuthControllerTest {
                 .thenThrow(new AuthenticationException("Credenciales inválidas"));
 
         // When & Then
-        mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
+        mockMvc.perform(
+                post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_ERROR"))
@@ -90,9 +99,10 @@ class AuthControllerTest {
         LoginRequest loginRequest = new LoginRequest("", ""); // Invalid input
 
         // When & Then
-        mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
+        mockMvc.perform(
+                post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
@@ -104,15 +114,19 @@ class AuthControllerTest {
     void refreshToken_WithValidToken_ShouldReturnNewAuthResponse() throws Exception {
         // Given
         RefreshTokenRequest refreshRequest = new RefreshTokenRequest("valid-refresh-token");
-        AuthResponse.UserInfo userInfo = new AuthResponse.UserInfo(1L, "testuser", "test@example.com", User.UserRole.OPERATOR);
-        AuthResponse authResponse = new AuthResponse("new-access-token", "valid-refresh-token", 3600L, userInfo);
+        AuthResponse.UserInfo userInfo
+                = new AuthResponse.UserInfo(
+                        1L, "testuser", "test@example.com", User.UserRole.OPERATOR);
+        AuthResponse authResponse
+                = new AuthResponse("new-access-token", "valid-refresh-token", 3600L, userInfo);
 
         when(authService.refreshToken(any(RefreshTokenRequest.class))).thenReturn(authResponse);
 
         // When & Then
-        mockMvc.perform(post("/api/auth/refresh")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(refreshRequest)))
+        mockMvc.perform(
+                post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(refreshRequest)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.accessToken").value("new-access-token"))
@@ -129,9 +143,10 @@ class AuthControllerTest {
                 .thenThrow(new InvalidTokenException("Refresh token inválido"));
 
         // When & Then
-        mockMvc.perform(post("/api/auth/refresh")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(refreshRequest)))
+        mockMvc.perform(
+                post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(refreshRequest)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("INVALID_TOKEN"))
@@ -144,9 +159,10 @@ class AuthControllerTest {
         LogoutRequest logoutRequest = new LogoutRequest("valid-refresh-token");
 
         // When & Then
-        mockMvc.perform(post("/api/auth/logout")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(logoutRequest)))
+        mockMvc.perform(
+                post("/api/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(logoutRequest)))
                 .andExpect(status().isOk());
     }
 
@@ -156,12 +172,14 @@ class AuthControllerTest {
         LogoutRequest logoutRequest = new LogoutRequest("invalid-refresh-token");
 
         doThrow(new InvalidTokenException("Refresh token inválido"))
-                .when(authService).logout(any(LogoutRequest.class));
+                .when(authService)
+                .logout(any(LogoutRequest.class));
 
         // When & Then
-        mockMvc.perform(post("/api/auth/logout")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(logoutRequest)))
+        mockMvc.perform(
+                post("/api/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(logoutRequest)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("INVALID_TOKEN"))
@@ -174,9 +192,10 @@ class AuthControllerTest {
         LogoutRequest logoutRequest = new LogoutRequest(""); // Invalid input
 
         // When & Then
-        mockMvc.perform(post("/api/auth/logout")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(logoutRequest)))
+        mockMvc.perform(
+                post("/api/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(logoutRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
