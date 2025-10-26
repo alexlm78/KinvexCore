@@ -29,6 +29,7 @@ spring:
 ## Configuración por Ambiente
 
 ### Desarrollo (`dev`)
+
 - Base de datos PostgreSQL local
 - Logs detallados habilitados
 - Endpoints de desarrollo disponibles
@@ -36,18 +37,21 @@ spring:
 - CORS permisivo para desarrollo local
 
 ### Testing (`test`)
+
 - Base de datos H2 en memoria
 - Configuración optimizada para pruebas rápidas
 - JWT con expiración corta (5 minutos)
 - Logs mínimos
 
 ### Staging (`staging`)
+
 - Configuración similar a producción
 - Endpoints de prueba habilitados
 - Logs moderados
 - Validaciones de seguridad activas
 
 ### Producción (`prod`)
+
 - Configuración de seguridad máxima
 - Logs optimizados para rendimiento
 - JWT con expiración corta (30 minutos)
@@ -100,14 +104,17 @@ LOG_MAX_FILE_SIZE=100MB
 ## Configuración de Seguridad
 
 ### JWT
+
 - **Desarrollo**: Clave simple, expiración larga
 - **Producción**: Clave segura (mínimo 256 bits), expiración corta
 
 ### CORS
+
 - **Desarrollo**: Orígenes múltiples permitidos
 - **Producción**: Solo dominios específicos
 
 ### Base de Datos
+
 - **Desarrollo**: Pool pequeño, DDL automático
 - **Producción**: Pool optimizado, solo validación
 
@@ -146,8 +153,9 @@ La aplicación incluye validaciones automáticas:
 ## Ejemplos de Configuración
 
 ### Docker Compose (Desarrollo)
+
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   kinvex-core:
     image: kinvex-core:latest
@@ -161,6 +169,7 @@ services:
 ```
 
 ### Kubernetes (Producción)
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -170,16 +179,16 @@ spec:
   template:
     spec:
       containers:
-      - name: kinvex-core
-        image: kinvex-core:1.0.0
-        env:
-        - name: SPRING_PROFILES_ACTIVE
-          value: "prod"
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: kinvex-secrets
-              key: jwt-secret
+        - name: kinvex-core
+          image: kinvex-core:1.0.0
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: kinvex-secrets
+                  key: jwt-secret
 ```
 
 ## Troubleshooting
@@ -187,12 +196,14 @@ spec:
 ### Problemas Comunes
 
 1. **JWT Secret inválido**
+
    ```
    Error: JWT secret debe tener al menos 32 caracteres
    Solución: Configurar JWT_SECRET con valor seguro
    ```
 
 2. **Conexión a base de datos fallida**
+
    ```
    Error: Connection refused
    Solución: Verificar DB_HOST, DB_PORT y credenciales

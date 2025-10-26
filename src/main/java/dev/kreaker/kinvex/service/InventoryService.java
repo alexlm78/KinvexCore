@@ -1,6 +1,21 @@
 package dev.kreaker.kinvex.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import dev.kreaker.kinvex.dto.inventory.CreateProductRequest;
+import dev.kreaker.kinvex.dto.inventory.ExternalStockDeductionRequest;
+import dev.kreaker.kinvex.dto.inventory.ExternalStockDeductionResponse;
 import dev.kreaker.kinvex.dto.inventory.ProductSearchCriteria;
 import dev.kreaker.kinvex.dto.inventory.StockUpdateRequest;
 import dev.kreaker.kinvex.dto.inventory.UpdateProductRequest;
@@ -16,23 +31,13 @@ import dev.kreaker.kinvex.repository.CategoryRepository;
 import dev.kreaker.kinvex.repository.InventoryMovementRepository;
 import dev.kreaker.kinvex.repository.ProductRepository;
 import dev.kreaker.kinvex.repository.UserRepository;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Servicio de inventario que maneja operaciones CRUD de productos, actualización de stock con
- * validaciones y consultas por diferentes criterios.
+ * Servicio de inventario que maneja operaciones CRUD de productos,
+ * actualización de stock con validaciones y consultas por diferentes criterios.
  *
- * <p>Implementa los requerimientos 1.1, 1.2, 1.3, 1.5 del sistema Kinvex.
+ * <p>
+ * Implementa los requerimientos 1.1, 1.2, 1.3, 1.5 del sistema Kinvex.
  */
 @Service
 @Transactional
@@ -58,8 +63,8 @@ public class InventoryService {
 
     // ========== CRUD Operations ==========
     /**
-     * Crea un nuevo producto en el inventario. Requerimiento 1.1: Crear productos con código único,
-     * nombre, descripción, precio y stock inicial
+     * Crea un nuevo producto en el inventario. Requerimiento 1.1: Crear
+     * productos con código único, nombre, descripción, precio y stock inicial
      *
      * @param request Datos del producto a crear
      * @return Producto creado
@@ -85,14 +90,14 @@ public class InventoryService {
 
         // Asignar categoría si se especifica
         if (request.getCategoryId() != null) {
-            Category category =
-                    categoryRepository
+            Category category
+                    = categoryRepository
                             .findById(request.getCategoryId())
                             .orElseThrow(
-                                    () ->
-                                            new RuntimeException(
-                                                    "Categoría no encontrada: "
-                                                            + request.getCategoryId()));
+                                    ()
+                                    -> new RuntimeException(
+                                            "Categoría no encontrada: "
+                                            + request.getCategoryId()));
             product.setCategory(category);
         }
 
@@ -119,8 +124,8 @@ public class InventoryService {
     }
 
     /**
-     * Actualiza un producto existente. Requerimiento 1.2: Actualizar información de productos
-     * existentes
+     * Actualiza un producto existente. Requerimiento 1.2: Actualizar
+     * información de productos existentes
      *
      * @param productId ID del producto a actualizar
      * @param request Datos actualizados del producto
@@ -130,8 +135,8 @@ public class InventoryService {
     public Product updateProduct(Long productId, UpdateProductRequest request) {
         logger.info("Actualizando producto ID: {}", productId);
 
-        Product product =
-                productRepository
+        Product product
+                = productRepository
                         .findById(productId)
                         .orElseThrow(() -> new ProductNotFoundException(productId));
 
@@ -148,14 +153,14 @@ public class InventoryService {
 
         // Actualizar categoría si se especifica
         if (request.getCategoryId() != null) {
-            Category category =
-                    categoryRepository
+            Category category
+                    = categoryRepository
                             .findById(request.getCategoryId())
                             .orElseThrow(
-                                    () ->
-                                            new RuntimeException(
-                                                    "Categoría no encontrada: "
-                                                            + request.getCategoryId()));
+                                    ()
+                                    -> new RuntimeException(
+                                            "Categoría no encontrada: "
+                                            + request.getCategoryId()));
             product.setCategory(category);
         }
 
@@ -179,7 +184,8 @@ public class InventoryService {
     }
 
     /**
-     * Obtiene un producto por su código. Requerimiento 1.3: Consultar productos por código
+     * Obtiene un producto por su código. Requerimiento 1.3: Consultar productos
+     * por código
      *
      * @param code Código del producto
      * @return Producto encontrado
@@ -212,8 +218,8 @@ public class InventoryService {
     public void deleteProduct(Long productId) {
         logger.info("Eliminando producto ID: {}", productId);
 
-        Product product =
-                productRepository
+        Product product
+                = productRepository
                         .findById(productId)
                         .orElseThrow(() -> new ProductNotFoundException(productId));
 
@@ -225,8 +231,8 @@ public class InventoryService {
 
     // ========== Stock Management ==========
     /**
-     * Incrementa el stock de un producto. Requerimiento 1.5: Mantener historial de cambios en la
-     * información de productos
+     * Incrementa el stock de un producto. Requerimiento 1.5: Mantener historial
+     * de cambios en la información de productos
      *
      * @param productId ID del producto
      * @param request Datos de la actualización de stock
@@ -239,8 +245,8 @@ public class InventoryService {
                 productId,
                 request.getQuantity());
 
-        Product product =
-                productRepository
+        Product product
+                = productRepository
                         .findById(productId)
                         .orElseThrow(() -> new ProductNotFoundException(productId));
 
@@ -249,8 +255,8 @@ public class InventoryService {
         productRepository.save(product);
 
         // Crear movimiento de inventario
-        InventoryMovement movement =
-                createInventoryMovement(
+        InventoryMovement movement
+                = createInventoryMovement(
                         product,
                         MovementType.IN,
                         request.getQuantity(),
@@ -264,8 +270,8 @@ public class InventoryService {
     }
 
     /**
-     * Decrementa el stock de un producto con validaciones. Requerimiento 1.5: Mantener historial de
-     * cambios en la información de productos
+     * Decrementa el stock de un producto con validaciones. Requerimiento 1.5:
+     * Mantener historial de cambios en la información de productos
      *
      * @param productId ID del producto
      * @param request Datos de la actualización de stock
@@ -279,8 +285,8 @@ public class InventoryService {
                 productId,
                 request.getQuantity());
 
-        Product product =
-                productRepository
+        Product product
+                = productRepository
                         .findById(productId)
                         .orElseThrow(() -> new ProductNotFoundException(productId));
 
@@ -298,8 +304,8 @@ public class InventoryService {
         productRepository.save(product);
 
         // Crear movimiento de inventario
-        InventoryMovement movement =
-                createInventoryMovement(
+        InventoryMovement movement
+                = createInventoryMovement(
                         product,
                         MovementType.OUT,
                         request.getQuantity(),
@@ -324,8 +330,8 @@ public class InventoryService {
     public InventoryMovement adjustStock(Long productId, Integer newStock, String notes) {
         logger.info("Ajustando stock del producto ID: {} a {} unidades", productId, newStock);
 
-        Product product =
-                productRepository
+        Product product
+                = productRepository
                         .findById(productId)
                         .orElseThrow(() -> new ProductNotFoundException(productId));
 
@@ -345,8 +351,8 @@ public class InventoryService {
         MovementType movementType = difference > 0 ? MovementType.IN : MovementType.OUT;
         Integer quantity = Math.abs(difference);
 
-        InventoryMovement movement =
-                createInventoryMovement(
+        InventoryMovement movement
+                = createInventoryMovement(
                         product,
                         movementType,
                         quantity,
@@ -364,8 +370,8 @@ public class InventoryService {
 
     // ========== Search and Query Methods ==========
     /**
-     * Busca productos por diferentes criterios. Requerimiento 1.3: Consultar productos por código,
-     * nombre o categoría
+     * Busca productos por diferentes criterios. Requerimiento 1.3: Consultar
+     * productos por código, nombre o categoría
      *
      * @param criteria Criterios de búsqueda
      * @param pageable Configuración de paginación
@@ -391,7 +397,8 @@ public class InventoryService {
     }
 
     /**
-     * Busca productos por nombre. Requerimiento 1.3: Consultar productos por nombre
+     * Busca productos por nombre. Requerimiento 1.3: Consultar productos por
+     * nombre
      *
      * @param name Nombre o parte del nombre del producto
      * @return Lista de productos que coinciden
@@ -402,7 +409,8 @@ public class InventoryService {
     }
 
     /**
-     * Busca productos por código. Requerimiento 1.3: Consultar productos por código
+     * Busca productos por código. Requerimiento 1.3: Consultar productos por
+     * código
      *
      * @param code Código o parte del código del producto
      * @return Lista de productos que coinciden
@@ -413,7 +421,8 @@ public class InventoryService {
     }
 
     /**
-     * Busca productos por categoría. Requerimiento 1.3: Consultar productos por categoría
+     * Busca productos por categoría. Requerimiento 1.3: Consultar productos por
+     * categoría
      *
      * @param categoryId ID de la categoría
      * @return Lista de productos de la categoría
@@ -477,6 +486,77 @@ public class InventoryService {
         return productRepository.findProductsByStockRange(minStock, maxStock);
     }
 
+    // ========== External API Methods ==========
+    /**
+     * Descuenta stock para sistemas externos de facturación.
+     *
+     * Implementa los requerimientos 2.1, 2.2, 2.3, 2.4: - 2.1: Endpoint REST
+     * para descuento de inventario que reciba código de producto y cantidad -
+     * 2.2: Reducir el stock del producto especificado cuando se reciba una
+     * solicitud válida - 2.3: Retornar error HTTP 400 si el stock disponible es
+     * insuficiente - 2.4: Registrar cada movimiento de salida con timestamp,
+     * producto, cantidad y sistema origen
+     *
+     * @param request Solicitud de descuento de stock desde sistema externo
+     * @return Respuesta con detalles del descuento realizado
+     * @throws ProductNotFoundException si el producto no existe
+     * @throws InsufficientStockException si no hay suficiente stock
+     */
+    public ExternalStockDeductionResponse deductStockForExternalSystem(ExternalStockDeductionRequest request) {
+        logger.info("Procesando descuento de stock externo para producto: {} desde sistema: {}",
+                request.getProductCode(), request.getSourceSystem());
+
+        // Buscar producto por código (Requerimiento 2.1)
+        Product product = productRepository
+                .findByCode(request.getProductCode())
+                .orElseThrow(() -> new ProductNotFoundException("código", request.getProductCode()));
+
+        // Validar que el producto esté activo
+        if (!product.getActive()) {
+            throw new ProductNotFoundException("código", request.getProductCode());
+        }
+
+        // Guardar stock anterior para la respuesta
+        Integer previousStock = product.getCurrentStock();
+
+        // Validar stock disponible (Requerimiento 2.3)
+        if (!product.hasAvailableStock(request.getQuantity())) {
+            throw new InsufficientStockException(
+                    product.getId(),
+                    product.getCode(),
+                    product.getCurrentStock(),
+                    request.getQuantity());
+        }
+
+        // Reducir stock (Requerimiento 2.2)
+        product.decreaseStock(request.getQuantity());
+        productRepository.save(product);
+
+        // Registrar movimiento de inventario (Requerimiento 2.4)
+        InventoryMovement movement = createInventoryMovement(
+                product,
+                MovementType.OUT,
+                request.getQuantity(),
+                InventoryMovement.ReferenceType.SALE,
+                null,
+                request.getSourceSystem() != null ? request.getSourceSystem() : "EXTERNAL_BILLING",
+                request.getNotes() != null ? request.getNotes() : "Descuento desde sistema de facturación externo");
+
+        logger.info("Stock deducido exitosamente para producto: {}. Stock anterior: {}, nuevo stock: {}",
+                product.getCode(), previousStock, product.getCurrentStock());
+
+        // Crear respuesta con timestamp y detalles del movimiento (Requerimiento 2.4)
+        return ExternalStockDeductionResponse.success(
+                product.getCode(),
+                product.getName(),
+                request.getQuantity(),
+                previousStock,
+                product.getCurrentStock(),
+                movement.getSourceSystem(),
+                movement.getCreatedAt(),
+                movement.getId());
+    }
+
     // ========== Helper Methods ==========
     /**
      * Crea un movimiento de inventario.
@@ -523,7 +603,9 @@ public class InventoryService {
         return inventoryMovementRepository.save(movement);
     }
 
-    /** Verifica si los criterios de búsqueda están vacíos. */
+    /**
+     * Verifica si los criterios de búsqueda están vacíos.
+     */
     private boolean isEmptyCriteria(ProductSearchCriteria criteria) {
         return criteria.getCode() == null
                 && criteria.getName() == null
@@ -537,8 +619,8 @@ public class InventoryService {
     }
 
     /**
-     * Implementa búsqueda con criterios complejos. Esta es una implementación básica que puede
-     * expandirse según necesidades.
+     * Implementa búsqueda con criterios complejos. Esta es una implementación
+     * básica que puede expandirse según necesidades.
      */
     private Page<Product> searchProductsWithComplexCriteria(
             ProductSearchCriteria criteria, Pageable pageable) {
