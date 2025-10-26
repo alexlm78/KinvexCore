@@ -3,11 +3,10 @@ package dev.kreaker.kinvex.dto.inventory;
 import java.time.LocalDateTime;
 
 /**
- * DTO de respuesta para operaciones de descuento de stock desde sistemas
- * externos.
+ * DTO de respuesta para operaciones de descuento de stock desde sistemas externos.
  *
- * Implementa el requerimiento 2.4: Registrar cada movimiento de salida con
- * timestamp, producto, cantidad y sistema origen.
+ * <p>Implementa el requerimiento 2.4: Registrar cada movimiento de salida con timestamp, producto,
+ * cantidad y sistema origen.
  */
 public class ExternalStockDeductionResponse {
 
@@ -23,13 +22,18 @@ public class ExternalStockDeductionResponse {
     private String message;
 
     // Default constructor
-    public ExternalStockDeductionResponse() {
-    }
+    public ExternalStockDeductionResponse() {}
 
     // Constructor for successful deduction
-    public ExternalStockDeductionResponse(String productCode, String productName, Integer quantityDeducted,
-            Integer previousStock, Integer currentStock, String sourceSystem,
-            LocalDateTime timestamp, Long movementId) {
+    public ExternalStockDeductionResponse(
+            String productCode,
+            String productName,
+            Integer quantityDeducted,
+            Integer previousStock,
+            Integer currentStock,
+            String sourceSystem,
+            LocalDateTime timestamp,
+            Long movementId) {
         this.productCode = productCode;
         this.productName = productName;
         this.quantityDeducted = quantityDeducted;
@@ -43,13 +47,24 @@ public class ExternalStockDeductionResponse {
     }
 
     // Static factory method for success response
-    public static ExternalStockDeductionResponse success(String productCode, String productName,
-            Integer quantityDeducted, Integer previousStock,
-            Integer currentStock, String sourceSystem,
-            LocalDateTime timestamp, Long movementId) {
-        return new ExternalStockDeductionResponse(productCode, productName, quantityDeducted,
-                previousStock, currentStock, sourceSystem,
-                timestamp, movementId);
+    public static ExternalStockDeductionResponse success(
+            String productCode,
+            String productName,
+            Integer quantityDeducted,
+            Integer previousStock,
+            Integer currentStock,
+            String sourceSystem,
+            LocalDateTime timestamp,
+            Long movementId) {
+        return new ExternalStockDeductionResponse(
+                productCode,
+                productName,
+                quantityDeducted,
+                previousStock,
+                currentStock,
+                sourceSystem,
+                timestamp,
+                movementId);
     }
 
     // Static factory method for error response
@@ -146,16 +161,31 @@ public class ExternalStockDeductionResponse {
     @Override
     public String toString() {
         return "ExternalStockDeductionResponse{"
-                + "productCode='" + productCode + '\''
-                + ", productName='" + productName + '\''
-                + ", quantityDeducted=" + quantityDeducted
-                + ", previousStock=" + previousStock
-                + ", currentStock=" + currentStock
-                + ", sourceSystem='" + sourceSystem + '\''
-                + ", timestamp=" + timestamp
-                + ", movementId=" + movementId
-                + ", status='" + status + '\''
-                + ", message='" + message + '\''
+                + "productCode='"
+                + productCode
+                + '\''
+                + ", productName='"
+                + productName
+                + '\''
+                + ", quantityDeducted="
+                + quantityDeducted
+                + ", previousStock="
+                + previousStock
+                + ", currentStock="
+                + currentStock
+                + ", sourceSystem='"
+                + sourceSystem
+                + '\''
+                + ", timestamp="
+                + timestamp
+                + ", movementId="
+                + movementId
+                + ", status='"
+                + status
+                + '\''
+                + ", message='"
+                + message
+                + '\''
                 + '}';
     }
 }

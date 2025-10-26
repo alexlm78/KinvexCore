@@ -6,11 +6,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /**
- * DTO específico para solicitudes de descuento de stock desde sistemas externos
- * de facturación.
+ * DTO específico para solicitudes de descuento de stock desde sistemas externos de facturación.
  *
- * Implementa el requerimiento 2.1: Endpoint REST para descuento de inventario
- * que reciba código de producto y cantidad.
+ * <p>Implementa el requerimiento 2.1: Endpoint REST para descuento de inventario que reciba código
+ * de producto y cantidad.
  */
 public class ExternalStockDeductionRequest {
 
@@ -29,8 +28,7 @@ public class ExternalStockDeductionRequest {
     private String notes;
 
     // Default constructor
-    public ExternalStockDeductionRequest() {
-    }
+    public ExternalStockDeductionRequest() {}
 
     // Constructor with required fields
     public ExternalStockDeductionRequest(String productCode, Integer quantity) {
@@ -39,7 +37,8 @@ public class ExternalStockDeductionRequest {
     }
 
     // Constructor with all fields
-    public ExternalStockDeductionRequest(String productCode, Integer quantity, String sourceSystem, String notes) {
+    public ExternalStockDeductionRequest(
+            String productCode, Integer quantity, String sourceSystem, String notes) {
         this.productCode = productCode;
         this.quantity = quantity;
         this.sourceSystem = sourceSystem;
@@ -82,10 +81,17 @@ public class ExternalStockDeductionRequest {
     @Override
     public String toString() {
         return "ExternalStockDeductionRequest{"
-                + "productCode='" + productCode + '\''
-                + ", quantity=" + quantity
-                + ", sourceSystem='" + sourceSystem + '\''
-                + ", notes='" + notes + '\''
+                + "productCode='"
+                + productCode
+                + '\''
+                + ", quantity="
+                + quantity
+                + ", sourceSystem='"
+                + sourceSystem
+                + '\''
+                + ", notes='"
+                + notes
+                + '\''
                 + '}';
     }
 }

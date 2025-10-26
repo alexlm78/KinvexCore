@@ -3,7 +3,6 @@ package dev.kreaker.kinvex.exception;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,25 +14,23 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 /**
- * Manejador global de excepciones para la aplicación. Captura y maneja
- * diferentes tipos de excepciones de manera centralizada.
+ * Manejador global de excepciones para la aplicación. Captura y maneja diferentes tipos de
+ * excepciones de manera centralizada.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    /**
-     * Maneja excepciones de autenticación.
-     */
+    /** Maneja excepciones de autenticación. */
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(
             AuthenticationException ex, WebRequest request) {
 
         logger.warn("Error de autenticación: {}", ex.getMessage());
 
-        ErrorResponse errorResponse
-                = new ErrorResponse(
+        ErrorResponse errorResponse =
+                new ErrorResponse(
                         "AUTHENTICATION_ERROR",
                         ex.getMessage(),
                         LocalDateTime.now(),
@@ -42,17 +39,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
-    /**
-     * Maneja excepciones de token inválido.
-     */
+    /** Maneja excepciones de token inválido. */
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<ErrorResponse> handleInvalidTokenException(
             InvalidTokenException ex, WebRequest request) {
 
         logger.warn("Token inválido: {}", ex.getMessage());
 
-        ErrorResponse errorResponse
-                = new ErrorResponse(
+        ErrorResponse errorResponse =
+                new ErrorResponse(
                         "INVALID_TOKEN",
                         ex.getMessage(),
                         LocalDateTime.now(),
@@ -61,17 +56,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
-    /**
-     * Maneja excepciones de producto no encontrado.
-     */
+    /** Maneja excepciones de producto no encontrado. */
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleProductNotFoundException(
             ProductNotFoundException ex, WebRequest request) {
 
         logger.warn("Producto no encontrado: {}", ex.getMessage());
 
-        ErrorResponse errorResponse
-                = new ErrorResponse(
+        ErrorResponse errorResponse =
+                new ErrorResponse(
                         "PRODUCT_NOT_FOUND",
                         ex.getMessage(),
                         LocalDateTime.now(),
@@ -80,17 +73,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    /**
-     * Maneja excepciones de stock insuficiente.
-     */
+    /** Maneja excepciones de stock insuficiente. */
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<ErrorResponse> handleInsufficientStockException(
             InsufficientStockException ex, WebRequest request) {
 
         logger.warn("Stock insuficiente: {}", ex.getMessage());
 
-        ErrorResponse errorResponse
-                = new ErrorResponse(
+        ErrorResponse errorResponse =
+                new ErrorResponse(
                         "INSUFFICIENT_STOCK",
                         ex.getMessage(),
                         LocalDateTime.now(),
@@ -99,17 +90,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    /**
-     * Maneja excepciones de código de producto duplicado.
-     */
+    /** Maneja excepciones de código de producto duplicado. */
     @ExceptionHandler(DuplicateProductCodeException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateProductCodeException(
             DuplicateProductCodeException ex, WebRequest request) {
 
         logger.warn("Código de producto duplicado: {}", ex.getMessage());
 
-        ErrorResponse errorResponse
-                = new ErrorResponse(
+        ErrorResponse errorResponse =
+                new ErrorResponse(
                         "DUPLICATE_PRODUCT_CODE",
                         ex.getMessage(),
                         LocalDateTime.now(),
@@ -118,9 +107,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-    /**
-     * Maneja errores de validación de datos de entrada.
-     */
+    /** Maneja errores de validación de datos de entrada. */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(
             MethodArgumentNotValidException ex, WebRequest request) {
@@ -137,8 +124,8 @@ public class GlobalExceptionHandler {
                             errors.put(fieldName, errorMessage);
                         });
 
-        ValidationErrorResponse errorResponse
-                = new ValidationErrorResponse(
+        ValidationErrorResponse errorResponse =
+                new ValidationErrorResponse(
                         "VALIDATION_ERROR",
                         "Datos de entrada inválidos",
                         LocalDateTime.now(),
@@ -149,8 +136,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Maneja excepciones generales no capturadas. Excluye excepciones de
-     * autorización para que Spring Security las maneje.
+     * Maneja excepciones generales no capturadas. Excluye excepciones de autorización para que
+     * Spring Security las maneje.
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, WebRequest request) {
@@ -162,8 +149,8 @@ public class GlobalExceptionHandler {
 
         logger.error("Error interno del servidor: ", ex);
 
-        ErrorResponse errorResponse
-                = new ErrorResponse(
+        ErrorResponse errorResponse =
+                new ErrorResponse(
                         "INTERNAL_SERVER_ERROR",
                         "Error interno del servidor",
                         LocalDateTime.now(),
@@ -172,9 +159,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
-    /**
-     * Respuesta estándar de error.
-     */
+    /** Respuesta estándar de error. */
     public static class ErrorResponse {
 
         private String code;
@@ -223,9 +208,7 @@ public class GlobalExceptionHandler {
         }
     }
 
-    /**
-     * Respuesta de error para validaciones.
-     */
+    /** Respuesta de error para validaciones. */
     public static class ValidationErrorResponse extends ErrorResponse {
 
         private Map<String, String> fieldErrors;

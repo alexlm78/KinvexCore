@@ -27,21 +27,18 @@ import org.springframework.test.web.servlet.MockMvc;
 /**
  * Tests de integración para ExternalBillingController.
  *
- * Verifica los requerimientos 2.1 a 2.5 del sistema de facturación externa.
+ * <p>Verifica los requerimientos 2.1 a 2.5 del sistema de facturación externa.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class ExternalBillingControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @MockBean
-    private InventoryService inventoryService;
+    @MockBean private InventoryService inventoryService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ObjectMapper objectMapper;
 
     private ExternalStockDeductionRequest validRequest;
     private ExternalStockDeductionResponse successResponse;
@@ -54,29 +51,31 @@ class ExternalBillingControllerTest {
         validRequest.setSourceSystem("BILLING_SYSTEM");
         validRequest.setNotes("Venta desde sistema de facturación");
 
-        successResponse = ExternalStockDeductionResponse.success(
-                "TEST001",
-                "Test Product",
-                5,
-                100,
-                95,
-                "BILLING_SYSTEM",
-                LocalDateTime.now(),
-                123L
-        );
+        successResponse =
+                ExternalStockDeductionResponse.success(
+                        "TEST001",
+                        "Test Product",
+                        5,
+                        100,
+                        95,
+                        "BILLING_SYSTEM",
+                        LocalDateTime.now(),
+                        123L);
     }
 
     @Test
     @WithMockUser(roles = "OPERATOR")
     void deductStock_WithValidRequest_ShouldReturnSuccess() throws Exception {
         // Arrange
-        when(inventoryService.deductStockForExternalSystem(any(ExternalStockDeductionRequest.class)))
+        when(inventoryService.deductStockForExternalSystem(
+                        any(ExternalStockDeductionRequest.class)))
                 .thenReturn(successResponse);
 
         // Act & Assert
-        mockMvc.perform(post("/api/external/billing/stock/deduct")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validRequest)))
+        mockMvc.perform(
+                        post("/api/external/billing/stock/deduct")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("SUCCESS"))
                 .andExpect(jsonPath("$.productCode").value("TEST001"))
@@ -92,13 +91,15 @@ class ExternalBillingControllerTest {
     @WithMockUser(roles = "OPERATOR")
     void deductStock_WithInsufficientStock_ShouldReturnBadRequest() throws Exception {
         // Arrange
-        when(inventoryService.deductStockForExternalSystem(any(ExternalStockDeductionRequest.class)))
+        when(inventoryService.deductStockForExternalSystem(
+                        any(ExternalStockDeductionRequest.class)))
                 .thenThrow(new InsufficientStockException(1L, "TEST001", 2, 5));
 
         // Act & Assert
-        mockMvc.perform(post("/api/external/billing/stock/deduct")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validRequest)))
+        mockMvc.perform(
+                        post("/api/external/billing/stock/deduct")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -106,13 +107,15 @@ class ExternalBillingControllerTest {
     @WithMockUser(roles = "OPERATOR")
     void deductStock_WithNonExistentProduct_ShouldReturnNotFound() throws Exception {
         // Arrange
-        when(inventoryService.deductStockForExternalSystem(any(ExternalStockDeductionRequest.class)))
+        when(inventoryService.deductStockForExternalSystem(
+                        any(ExternalStockDeductionRequest.class)))
                 .thenThrow(new ProductNotFoundException("código", "NONEXISTENT"));
 
         // Act & Assert
-        mockMvc.perform(post("/api/external/billing/stock/deduct")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validRequest)))
+        mockMvc.perform(
+                        post("/api/external/billing/stock/deduct")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isNotFound());
     }
 
@@ -126,9 +129,10 @@ class ExternalBillingControllerTest {
         invalidRequest.setSourceSystem("BILLING_SYSTEM");
 
         // Act & Assert
-        mockMvc.perform(post("/api/external/billing/stock/deduct")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
+        mockMvc.perform(
+                        post("/api/external/billing/stock/deduct")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -142,18 +146,20 @@ class ExternalBillingControllerTest {
         // Missing productCode
 
         // Act & Assert
-        mockMvc.perform(post("/api/external/billing/stock/deduct")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
+        mockMvc.perform(
+                        post("/api/external/billing/stock/deduct")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void deductStock_WithoutAuthentication_ShouldReturnUnauthorized() throws Exception {
         // Act & Assert
-        mockMvc.perform(post("/api/external/billing/stock/deduct")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validRequest)))
+        mockMvc.perform(
+                        post("/api/external/billing/stock/deduct")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -161,9 +167,10 @@ class ExternalBillingControllerTest {
     @WithMockUser(roles = "VIEWER")
     void deductStock_WithInsufficientRole_ShouldReturnForbidden() throws Exception {
         // Act & Assert
-        mockMvc.perform(post("/api/external/billing/stock/deduct")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validRequest)))
+        mockMvc.perform(
+                        post("/api/external/billing/stock/deduct")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isForbidden());
     }
 
@@ -171,13 +178,15 @@ class ExternalBillingControllerTest {
     @WithMockUser(roles = "MANAGER")
     void deductStock_WithManagerRole_ShouldReturnSuccess() throws Exception {
         // Arrange
-        when(inventoryService.deductStockForExternalSystem(any(ExternalStockDeductionRequest.class)))
+        when(inventoryService.deductStockForExternalSystem(
+                        any(ExternalStockDeductionRequest.class)))
                 .thenReturn(successResponse);
 
         // Act & Assert
-        mockMvc.perform(post("/api/external/billing/stock/deduct")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validRequest)))
+        mockMvc.perform(
+                        post("/api/external/billing/stock/deduct")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("SUCCESS"));
     }
@@ -186,13 +195,15 @@ class ExternalBillingControllerTest {
     @WithMockUser(roles = "ADMIN")
     void deductStock_WithAdminRole_ShouldReturnSuccess() throws Exception {
         // Arrange
-        when(inventoryService.deductStockForExternalSystem(any(ExternalStockDeductionRequest.class)))
+        when(inventoryService.deductStockForExternalSystem(
+                        any(ExternalStockDeductionRequest.class)))
                 .thenReturn(successResponse);
 
         // Act & Assert
-        mockMvc.perform(post("/api/external/billing/stock/deduct")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validRequest)))
+        mockMvc.perform(
+                        post("/api/external/billing/stock/deduct")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("SUCCESS"));
     }
