@@ -6,26 +6,33 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.kreaker.kinvex.dto.report.InventoryMovementReportDto;
+import dev.kreaker.kinvex.dto.report.ReportExportRequest;
 import dev.kreaker.kinvex.dto.report.ReportFilterDto;
 import dev.kreaker.kinvex.dto.report.StockLevelReportDto;
 import dev.kreaker.kinvex.dto.report.SupplierPerformanceReportDto;
 import dev.kreaker.kinvex.entity.InventoryMovement.MovementType;
 import dev.kreaker.kinvex.entity.InventoryMovement.ReferenceType;
+import dev.kreaker.kinvex.service.ReportExportService;
 import dev.kreaker.kinvex.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 /**
  * REST Controller for report generation and retrieval Requirements: 4.1, 4.2,
@@ -39,9 +46,11 @@ public class ReportController {
     private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
 
     private final ReportService reportService;
+    private final ReportExportService reportExportService;
 
-    public ReportController(ReportService reportService) {
+    public ReportController(ReportService reportService, ReportExportService reportExportService) {
         this.reportService = reportService;
+        this.reportExportService = reportExportService;
     }
 
     /**
@@ -325,6 +334,69 @@ public class ReportController {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
             logger.error("Error generating daily movement summary", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Export reports in PDF or Excel format Requirement 4.5: Export reports in
+     * PDF and Excel formats
+     */
+    @PostMapping("/export")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @Operation(summary = "Export reports",
+            description = "Export reports in PDF or Excel format with filtering options")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully exported report"),
+        @ApiResponse(responseCode = "400", description = "Invalid export request parameters"),
+        @ApiResponse(responseCode = "403", description = "Access denied"),
+        @ApiResponse(responseCode = "500", description = "Error generating export file")
+    })
+    public ResponseEntity<byte[]> exportReport(
+            @Parameter(description = "Export request with report type, format, and filters")
+            @Valid @RequestBody ReportExportRequest request) {
+
+        logger.info("Exporting report: {}", request);
+
+        try {
+            // Validate request
+            if (request.getReportType() == null) {
+                logger.error("Report type is required for export");
+                return ResponseEntity.badRequest().build();
+            }
+
+            if (request.getFormat() == null) {
+                logger.error("Export format is required");
+                return ResponseEntity.badRequest().build();
+            }
+
+            // Generate export file
+            byte[] exportData = reportExportService.exportReport(request);
+            String filename = reportExportService.generateFilename(request);
+
+            // Set appropriate content type and headers
+            MediaType contentType;
+            if (request.getFormat() == ReportExportRequest.ExportFormat.PDF) {
+                contentType = MediaType.APPLICATION_PDF;
+            } else {
+                contentType = MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(contentType);
+            headers.setContentDispositionFormData("attachment", filename);
+            headers.setContentLength(exportData.length);
+
+            logger.info("Successfully exported report: {} ({} bytes)", filename, exportData.length);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(exportData);
+
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid parameters for report export: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            logger.error("Error exporting report", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
