@@ -1,53 +1,53 @@
 # Kinvex Core - Backend API
 
-Backend API del sistema de inventario Kinvex desarrollado con Spring Boot.
+Backend API for the Kinvex inventory system developed with Spring Boot.
 
-## Tecnologías
+## Technologies
 
 - **Java 21**
 - **Spring Boot 3.2.0**
-- **Spring Security** - Autenticación y autorización
-- **Spring Data JPA** - Persistencia de datos
-- **PostgreSQL** - Base de datos principal
-- **Redis** - Cache y sesiones
-- **JWT** - Tokens de autenticación
-- **Flyway** - Migraciones de base de datos
-- **OpenAPI/Swagger** - Documentación de API
-- **Docker** - Containerización
+- **Spring Security** - Authentication and authorization
+- **Spring Data JPA** - Data persistence
+- **PostgreSQL** - Main database
+- **Redis** - Cache and sessions
+- **JWT** - Authentication tokens
+- **Flyway** - Database migrations
+- **OpenAPI/Swagger** - API documentation
+- **Docker** - Containerization
 
-## Características
+## Features
 
-- API RESTful completa para gestión de inventario
-- Autenticación JWT con Spring Security
-- Documentación automática con OpenAPI
-- Generación de reportes (PDF, Excel)
-- Cache con Redis
-- Migraciones automáticas de base de datos
-- Monitoreo con Spring Actuator
+- Complete RESTful API for inventory management
+- JWT authentication with Spring Security
+- Automatic documentation with OpenAPI
+- Report generation (PDF, Excel)
+- Redis caching
+- Automatic database migrations
+- Monitoring with Spring Actuator
 
-## Requisitos
+## Requirements
 
 - Java 21+
 - PostgreSQL 13+
 - Redis 6+
 - Gradle 8+
 
-## Instalación y Ejecución
+## Installation and Execution
 
-### Desarrollo Local
+### Local Development
 
-1. Clona el repositorio:
+1. Clone the repository:
 ```bash
 git clone <repository-url>
 cd KinvexCore
 ```
 
-2. Configura las variables de entorno (copia `.env.example` a `.env`):
+2. Configure environment variables (copy `.env.example` to `.env`):
 ```bash
 cp .env.example .env
 ```
 
-3. Ejecuta con Gradle:
+3. Run with Gradle:
 ```bash
 ./gradlew bootRun
 ```
@@ -61,49 +61,49 @@ docker run -p 8080:8080 kinvex-core
 
 ## API Documentation
 
-Una vez ejecutándose, la documentación de la API estará disponible en:
+Once running, API documentation will be available at:
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 - OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 
-## Estructura del Proyecto
+## Project Structure
 
 ```
 src/
 ├── main/
 │   ├── java/dev/kreaker/kinvex/
-│   │   ├── config/          # Configuraciones
-│   │   ├── controller/      # Controladores REST
-│   │   ├── service/         # Lógica de negocio
-│   │   ├── repository/      # Repositorios JPA
-│   │   ├── entity/          # Entidades JPA
+│   │   ├── config/          # Configurations
+│   │   ├── controller/      # REST Controllers
+│   │   ├── service/         # Business logic
+│   │   ├── repository/      # JPA Repositories
+│   │   ├── entity/          # JPA Entities
 │   │   ├── dto/             # DTOs
-│   │   └── security/        # Configuración de seguridad
+│   │   └── security/        # Security configuration
 │   └── resources/
-│       ├── application.yml  # Configuración principal
-│       └── db/migration/    # Migraciones Flyway
-└── test/                    # Tests unitarios e integración
+│       ├── application.yml  # Main configuration
+│       └── db/migration/    # Flyway migrations
+└── test/                    # Unit and integration tests
 ```
 
 ## Testing
 
 ```bash
-# Ejecutar todos los tests
+# Run all tests
 ./gradlew test
 
-# Ejecutar tests con coverage
+# Run tests with coverage
 ./gradlew test jacocoTestReport
 ```
 
-## Contribución
+## Contributing
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -am 'Añade nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Crea un Pull Request
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -am 'Add new feature'`)
+4. Push to the branch (`git push origin feature/new-feature`)
+5. Create a Pull Request
 
-## Licencia
+## License
 
-Este proyecto está bajo la licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
+This project is under the MIT license. See the [LICENSE](LICENSE) file for more details.
 
-**Desarrollado por [Kreaker.dev](https://kreaker.dev)**
+**Developed by [Kreaker.dev](https://kreaker.dev)**
