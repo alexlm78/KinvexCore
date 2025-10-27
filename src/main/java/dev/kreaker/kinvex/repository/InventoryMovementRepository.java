@@ -69,11 +69,11 @@ public interface InventoryMovementRepository extends JpaRepository<InventoryMove
             @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     @Query(
-            "SELECT DATE(im.createdAt), SUM(CASE WHEN im.movementType = 'IN' THEN im.quantity ELSE 0 END), "
+            "SELECT CAST(im.createdAt AS date), SUM(CASE WHEN im.movementType = 'IN' THEN im.quantity ELSE 0 END), "
                     + "SUM(CASE WHEN im.movementType = 'OUT' THEN im.quantity ELSE 0 END) "
                     + "FROM InventoryMovement im "
                     + "WHERE im.createdAt BETWEEN :startDate AND :endDate "
-                    + "GROUP BY DATE(im.createdAt) ORDER BY DATE(im.createdAt)")
+                    + "GROUP BY CAST(im.createdAt AS date) ORDER BY CAST(im.createdAt AS date)")
     List<Object[]> findDailyMovementSummaryBetween(
             @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
