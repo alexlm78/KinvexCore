@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -57,22 +56,19 @@ import org.springframework.test.web.servlet.MockMvc;
 /**
  * Tests de integración para OrderController.
  *
- * Verifica los endpoints REST para gestión de órdenes de compra según los
- * requerimientos 3.3 y 3.4.
+ * <p>Verifica los endpoints REST para gestión de órdenes de compra según los requerimientos 3.3 y
+ * 3.4.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class OrderControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @MockBean
-    private OrderService orderService;
+    @MockBean private OrderService orderService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ObjectMapper objectMapper;
 
     private PurchaseOrder testOrder;
     private Supplier testSupplier;
@@ -86,17 +82,25 @@ class OrderControllerTest {
     @BeforeEach
     void setUp() {
         // Setup test entities
-        testSupplier = new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
+        testSupplier =
+                new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
         testSupplier.setId(1L);
 
         testProduct = new Product("PROD001", "Test Product", new BigDecimal("10.00"));
         testProduct.setId(1L);
         testProduct.setCurrentStock(100);
 
-        testUser = new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
+        testUser =
+                new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
         testUser.setId(1L);
 
-        testOrder = new PurchaseOrder("PO001", testSupplier, LocalDate.now(), LocalDate.now().plusDays(7), testUser);
+        testOrder =
+                new PurchaseOrder(
+                        "PO001",
+                        testSupplier,
+                        LocalDate.now(),
+                        LocalDate.now().plusDays(7),
+                        testUser);
         testOrder.setId(1L);
         testOrder.setStatus(OrderStatus.PENDING);
         testOrder.setTotalAmount(new BigDecimal("100.00"));
@@ -141,9 +145,10 @@ class OrderControllerTest {
         when(orderService.createOrder(any(CreateOrderRequest.class))).thenReturn(testOrder);
 
         // Act & Assert
-        mockMvc.perform(post("/api/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createOrderRequest)))
+        mockMvc.perform(
+                        post("/api/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(createOrderRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(1)))
@@ -160,9 +165,10 @@ class OrderControllerTest {
                 .thenThrow(new DuplicateOrderNumberException("PO001"));
 
         // Act & Assert
-        mockMvc.perform(post("/api/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createOrderRequest)))
+        mockMvc.perform(
+                        post("/api/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(createOrderRequest)))
                 .andExpect(status().isConflict());
     }
 
@@ -174,9 +180,10 @@ class OrderControllerTest {
                 .thenThrow(new SupplierNotFoundException(1L));
 
         // Act & Assert
-        mockMvc.perform(post("/api/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createOrderRequest)))
+        mockMvc.perform(
+                        post("/api/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(createOrderRequest)))
                 .andExpect(status().isNotFound());
     }
 
@@ -188,9 +195,10 @@ class OrderControllerTest {
                 .thenThrow(new ProductNotFoundException(1L));
 
         // Act & Assert
-        mockMvc.perform(post("/api/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createOrderRequest)))
+        mockMvc.perform(
+                        post("/api/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(createOrderRequest)))
                 .andExpect(status().isNotFound());
     }
 
@@ -198,9 +206,10 @@ class OrderControllerTest {
     @WithMockUser(roles = "VIEWER")
     void createOrder_WithViewerRole_ShouldReturnForbidden() throws Exception {
         // Act & Assert
-        mockMvc.perform(post("/api/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createOrderRequest)))
+        mockMvc.perform(
+                        post("/api/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(createOrderRequest)))
                 .andExpect(status().isForbidden());
     }
 
@@ -214,9 +223,7 @@ class OrderControllerTest {
         when(orderService.getAllOrders(any(Pageable.class))).thenReturn(orderPage);
 
         // Act & Assert
-        mockMvc.perform(get("/api/orders")
-                .param("page", "0")
-                .param("size", "20"))
+        mockMvc.perform(get("/api/orders").param("page", "0").param("size", "20"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.content", hasSize(1)))
@@ -247,8 +254,7 @@ class OrderControllerTest {
         when(orderService.getOrderById(999L)).thenThrow(new OrderNotFoundException(999L));
 
         // Act & Assert
-        mockMvc.perform(get("/api/orders/999"))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/orders/999")).andExpect(status().isNotFound());
     }
 
     @Test
@@ -271,12 +277,11 @@ class OrderControllerTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 20);
         Page<PurchaseOrder> orderPage = new PageImpl<>(Arrays.asList(testOrder), pageable, 1);
-        when(orderService.getOrdersByStatus(eq(OrderStatus.PENDING), any(Pageable.class))).thenReturn(orderPage);
+        when(orderService.getOrdersByStatus(eq(OrderStatus.PENDING), any(Pageable.class)))
+                .thenReturn(orderPage);
 
         // Act & Assert
-        mockMvc.perform(get("/api/orders/status/PENDING")
-                .param("page", "0")
-                .param("size", "20"))
+        mockMvc.perform(get("/api/orders/status/PENDING").param("page", "0").param("size", "20"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.content", hasSize(1)))
@@ -289,12 +294,14 @@ class OrderControllerTest {
     void updateOrderStatus_WithValidTransition_ShouldReturnUpdatedOrder() throws Exception {
         // Arrange
         testOrder.setStatus(OrderStatus.CONFIRMED);
-        when(orderService.updateOrderStatus(eq(1L), any(UpdateOrderStatusRequest.class))).thenReturn(testOrder);
+        when(orderService.updateOrderStatus(eq(1L), any(UpdateOrderStatusRequest.class)))
+                .thenReturn(testOrder);
 
         // Act & Assert
-        mockMvc.perform(put("/api/orders/1/status")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateStatusRequest)))
+        mockMvc.perform(
+                        put("/api/orders/1/status")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateStatusRequest)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(1)))
@@ -309,9 +316,10 @@ class OrderControllerTest {
                 .thenThrow(new InvalidOrderOperationException("Invalid status transition"));
 
         // Act & Assert
-        mockMvc.perform(put("/api/orders/1/status")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateStatusRequest)))
+        mockMvc.perform(
+                        put("/api/orders/1/status")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateStatusRequest)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -319,9 +327,10 @@ class OrderControllerTest {
     @WithMockUser(roles = "VIEWER")
     void updateOrderStatus_WithViewerRole_ShouldReturnForbidden() throws Exception {
         // Act & Assert
-        mockMvc.perform(put("/api/orders/1/status")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateStatusRequest)))
+        mockMvc.perform(
+                        put("/api/orders/1/status")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateStatusRequest)))
                 .andExpect(status().isForbidden());
     }
 
@@ -330,18 +339,27 @@ class OrderControllerTest {
     @WithMockUser(roles = "OPERATOR")
     void receiveOrder_WithValidData_ShouldReturnReceiptResponse() throws Exception {
         // Arrange
-        OrderDetailReceiptResponse receiptDetail = new OrderDetailReceiptResponse(
-                1L, 1L, "PROD001", "Test Product", 10, 0, 5, 5, 5, false);
-        OrderReceiptResponse receiptResponse = OrderReceiptResponse.success(
-                1L, "PO001", OrderStatus.PARTIAL, LocalDate.now(), "Partial receipt",
-                Arrays.asList(receiptDetail), false);
+        OrderDetailReceiptResponse receiptDetail =
+                new OrderDetailReceiptResponse(
+                        1L, 1L, "PROD001", "Test Product", 10, 0, 5, 5, 5, false);
+        OrderReceiptResponse receiptResponse =
+                OrderReceiptResponse.success(
+                        1L,
+                        "PO001",
+                        OrderStatus.PARTIAL,
+                        LocalDate.now(),
+                        "Partial receipt",
+                        Arrays.asList(receiptDetail),
+                        false);
 
-        when(orderService.receiveOrder(eq(1L), any(ReceiveOrderRequest.class))).thenReturn(receiptResponse);
+        when(orderService.receiveOrder(eq(1L), any(ReceiveOrderRequest.class)))
+                .thenReturn(receiptResponse);
 
         // Act & Assert
-        mockMvc.perform(post("/api/orders/1/receive")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(receiveOrderRequest)))
+        mockMvc.perform(
+                        post("/api/orders/1/receive")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(receiveOrderRequest)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status", is("PARTIAL")))
@@ -356,12 +374,15 @@ class OrderControllerTest {
     void receiveOrder_WithCancelledOrder_ShouldReturnConflict() throws Exception {
         // Arrange
         when(orderService.receiveOrder(eq(1L), any(ReceiveOrderRequest.class)))
-                .thenThrow(new OrderStateConflictException("Cannot receive products from cancelled order"));
+                .thenThrow(
+                        new OrderStateConflictException(
+                                "Cannot receive products from cancelled order"));
 
         // Act & Assert
-        mockMvc.perform(post("/api/orders/1/receive")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(receiveOrderRequest)))
+        mockMvc.perform(
+                        post("/api/orders/1/receive")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(receiveOrderRequest)))
                 .andExpect(status().isConflict());
     }
 
@@ -373,9 +394,10 @@ class OrderControllerTest {
                 .thenThrow(new OrderNotFoundException(999L));
 
         // Act & Assert
-        mockMvc.perform(post("/api/orders/999/receive")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(receiveOrderRequest)))
+        mockMvc.perform(
+                        post("/api/orders/999/receive")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(receiveOrderRequest)))
                 .andExpect(status().isNotFound());
     }
 
@@ -383,9 +405,10 @@ class OrderControllerTest {
     @WithMockUser(roles = "VIEWER")
     void receiveOrder_WithViewerRole_ShouldReturnForbidden() throws Exception {
         // Act & Assert
-        mockMvc.perform(post("/api/orders/1/receive")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(receiveOrderRequest)))
+        mockMvc.perform(
+                        post("/api/orders/1/receive")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(receiveOrderRequest)))
                 .andExpect(status().isForbidden());
     }
 
@@ -413,8 +436,7 @@ class OrderControllerTest {
         when(orderService.getOrdersBySupplier(999L)).thenThrow(new SupplierNotFoundException(999L));
 
         // Act & Assert
-        mockMvc.perform(get("/api/orders/supplier/999"))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/orders/supplier/999")).andExpect(status().isNotFound());
     }
 
     @Test
@@ -436,8 +458,7 @@ class OrderControllerTest {
     @WithMockUser(roles = "VIEWER")
     void getOverdueOrders_WithViewerRole_ShouldReturnForbidden() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/api/orders/overdue"))
-                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/orders/overdue")).andExpect(status().isForbidden());
     }
 
     @Test
@@ -448,8 +469,7 @@ class OrderControllerTest {
         when(orderService.getOrdersDueSoon(anyInt())).thenReturn(ordersDueSoon);
 
         // Act & Assert
-        mockMvc.perform(get("/api/orders/due-soon")
-                .param("daysAhead", "7"))
+        mockMvc.perform(get("/api/orders/due-soon").param("daysAhead", "7"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -465,9 +485,10 @@ class OrderControllerTest {
                 .thenReturn(ordersInRange);
 
         // Act & Assert
-        mockMvc.perform(get("/api/orders/date-range")
-                .param("startDate", "2024-01-01")
-                .param("endDate", "2024-01-31"))
+        mockMvc.perform(
+                        get("/api/orders/date-range")
+                                .param("startDate", "2024-01-01")
+                                .param("endDate", "2024-01-31"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -477,16 +498,16 @@ class OrderControllerTest {
     @Test
     void getAllOrders_WithoutAuthentication_ShouldReturnUnauthorized() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/api/orders"))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/orders")).andExpect(status().isUnauthorized());
     }
 
     @Test
     void createOrder_WithoutAuthentication_ShouldReturnUnauthorized() throws Exception {
         // Act & Assert
-        mockMvc.perform(post("/api/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createOrderRequest)))
+        mockMvc.perform(
+                        post("/api/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(createOrderRequest)))
                 .andExpect(status().isUnauthorized());
     }
 }

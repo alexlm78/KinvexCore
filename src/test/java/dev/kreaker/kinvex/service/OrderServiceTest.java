@@ -1,30 +1,14 @@
 package dev.kreaker.kinvex.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import dev.kreaker.kinvex.dto.order.CreateOrderRequest;
 import dev.kreaker.kinvex.dto.order.OrderDetailReceiptRequest;
@@ -51,31 +35,38 @@ import dev.kreaker.kinvex.repository.ProductRepository;
 import dev.kreaker.kinvex.repository.PurchaseOrderRepository;
 import dev.kreaker.kinvex.repository.SupplierRepository;
 import dev.kreaker.kinvex.repository.UserRepository;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Tests unitarios para OrderService.
  *
- * Verifica la lógica de negocio de órdenes de compra según los requerimientos
- * 3.3 y 3.4.
+ * <p>Verifica la lógica de negocio de órdenes de compra según los requerimientos 3.3 y 3.4.
  */
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
-    @Mock
-    private PurchaseOrderRepository purchaseOrderRepository;
-    @Mock
-    private OrderDetailRepository orderDetailRepository;
-    @Mock
-    private SupplierRepository supplierRepository;
-    @Mock
-    private ProductRepository productRepository;
-    @Mock
-    private InventoryMovementRepository inventoryMovementRepository;
-    @Mock
-    private UserRepository userRepository;
+    @Mock private PurchaseOrderRepository purchaseOrderRepository;
+    @Mock private OrderDetailRepository orderDetailRepository;
+    @Mock private SupplierRepository supplierRepository;
+    @Mock private ProductRepository productRepository;
+    @Mock private InventoryMovementRepository inventoryMovementRepository;
+    @Mock private UserRepository userRepository;
 
-    @InjectMocks
-    private OrderService orderService;
+    @InjectMocks private OrderService orderService;
 
     private Supplier testSupplier;
     private Product testProduct;
@@ -86,7 +77,8 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
         // Setup test entities
-        testSupplier = new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
+        testSupplier =
+                new Supplier("Test Supplier", "John Doe", "supplier@example.com", "123-456-7890");
         testSupplier.setId(1L);
         testSupplier.setActive(true);
 
@@ -95,10 +87,17 @@ class OrderServiceTest {
         testProduct.setCurrentStock(100);
         testProduct.setActive(true);
 
-        testUser = new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
+        testUser =
+                new User("testuser", "test@example.com", "hashedpassword", User.UserRole.OPERATOR);
         testUser.setId(1L);
 
-        testOrder = new PurchaseOrder("PO001", testSupplier, LocalDate.now(), LocalDate.now().plusDays(7), testUser);
+        testOrder =
+                new PurchaseOrder(
+                        "PO001",
+                        testSupplier,
+                        LocalDate.now(),
+                        LocalDate.now().plusDays(7),
+                        testUser);
         testOrder.setId(1L);
         testOrder.setStatus(OrderStatus.PENDING);
 
@@ -126,9 +125,11 @@ class OrderServiceTest {
         when(purchaseOrderRepository.existsByOrderNumber("PO001")).thenReturn(true);
 
         // Act & Assert
-        assertThrows(DuplicateOrderNumberException.class, () -> {
-            orderService.createOrder(createOrderRequest);
-        });
+        assertThrows(
+                DuplicateOrderNumberException.class,
+                () -> {
+                    orderService.createOrder(createOrderRequest);
+                });
 
         verify(purchaseOrderRepository).existsByOrderNumber("PO001");
         verify(purchaseOrderRepository, never()).save(any(PurchaseOrder.class));
@@ -153,9 +154,11 @@ class OrderServiceTest {
         when(supplierRepository.findById(1L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(SupplierNotFoundException.class, () -> {
-            orderService.createOrder(createOrderRequest);
-        });
+        assertThrows(
+                SupplierNotFoundException.class,
+                () -> {
+                    orderService.createOrder(createOrderRequest);
+                });
 
         verify(supplierRepository).findById(1L);
         verify(purchaseOrderRepository, never()).save(any(PurchaseOrder.class));
@@ -182,9 +185,11 @@ class OrderServiceTest {
         when(supplierRepository.findById(1L)).thenReturn(Optional.of(testSupplier));
 
         // Act & Assert
-        assertThrows(SupplierNotFoundException.class, () -> {
-            orderService.createOrder(createOrderRequest);
-        });
+        assertThrows(
+                SupplierNotFoundException.class,
+                () -> {
+                    orderService.createOrder(createOrderRequest);
+                });
 
         verify(supplierRepository).findById(1L);
         verify(purchaseOrderRepository, never()).save(any(PurchaseOrder.class));
@@ -210,9 +215,11 @@ class OrderServiceTest {
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(ProductNotFoundException.class, () -> {
-            orderService.createOrder(createOrderRequest);
-        });
+        assertThrows(
+                ProductNotFoundException.class,
+                () -> {
+                    orderService.createOrder(createOrderRequest);
+                });
 
         verify(productRepository).findById(1L);
         verify(orderDetailRepository, never()).saveAll(any());
@@ -239,9 +246,11 @@ class OrderServiceTest {
         when(purchaseOrderRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(OrderNotFoundException.class, () -> {
-            orderService.getOrderById(999L);
-        });
+        assertThrows(
+                OrderNotFoundException.class,
+                () -> {
+                    orderService.getOrderById(999L);
+                });
 
         verify(purchaseOrderRepository).findById(999L);
     }
@@ -295,9 +304,11 @@ class OrderServiceTest {
         when(purchaseOrderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
 
         // Act & Assert
-        assertThrows(InvalidOrderOperationException.class, () -> {
-            orderService.updateOrderStatus(1L, updateStatusRequest);
-        });
+        assertThrows(
+                InvalidOrderOperationException.class,
+                () -> {
+                    orderService.updateOrderStatus(1L, updateStatusRequest);
+                });
 
         verify(purchaseOrderRepository).findById(1L);
         verify(purchaseOrderRepository, never()).save(any(PurchaseOrder.class));
@@ -320,9 +331,11 @@ class OrderServiceTest {
         when(purchaseOrderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
 
         // Act & Assert
-        assertThrows(OrderStateConflictException.class, () -> {
-            orderService.receiveOrder(1L, receiveOrderRequest);
-        });
+        assertThrows(
+                OrderStateConflictException.class,
+                () -> {
+                    orderService.receiveOrder(1L, receiveOrderRequest);
+                });
 
         verify(purchaseOrderRepository).findById(1L);
         verify(orderDetailRepository, never()).findById(anyLong());
@@ -344,9 +357,11 @@ class OrderServiceTest {
         when(purchaseOrderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
 
         // Act & Assert
-        assertThrows(InvalidOrderOperationException.class, () -> {
-            orderService.receiveOrder(1L, receiveOrderRequest);
-        });
+        assertThrows(
+                InvalidOrderOperationException.class,
+                () -> {
+                    orderService.receiveOrder(1L, receiveOrderRequest);
+                });
 
         verify(purchaseOrderRepository).findById(1L);
         verify(orderDetailRepository, never()).findById(anyLong());
@@ -369,9 +384,11 @@ class OrderServiceTest {
         when(orderDetailRepository.findById(1L)).thenReturn(Optional.of(testOrderDetail));
 
         // Act & Assert
-        assertThrows(InvalidOrderOperationException.class, () -> {
-            orderService.receiveOrder(1L, receiveOrderRequest);
-        });
+        assertThrows(
+                InvalidOrderOperationException.class,
+                () -> {
+                    orderService.receiveOrder(1L, receiveOrderRequest);
+                });
 
         verify(orderDetailRepository).findById(1L);
         verify(productRepository, never()).save(any(Product.class));
@@ -394,11 +411,12 @@ class OrderServiceTest {
         when(orderDetailRepository.findById(1L)).thenReturn(Optional.of(testOrderDetail));
         when(productRepository.save(any(Product.class))).thenReturn(testProduct);
         when(inventoryMovementRepository.save(any(InventoryMovement.class)))
-                .thenAnswer(invocation -> {
-                    InventoryMovement movement = invocation.getArgument(0);
-                    movement.setId(1L);
-                    return movement;
-                });
+                .thenAnswer(
+                        invocation -> {
+                            InventoryMovement movement = invocation.getArgument(0);
+                            movement.setId(1L);
+                            return movement;
+                        });
         when(purchaseOrderRepository.save(any(PurchaseOrder.class))).thenReturn(testOrder);
 
         // Act
@@ -459,9 +477,11 @@ class OrderServiceTest {
         when(supplierRepository.existsById(999L)).thenReturn(false);
 
         // Act & Assert
-        assertThrows(SupplierNotFoundException.class, () -> {
-            orderService.getOrdersBySupplier(999L);
-        });
+        assertThrows(
+                SupplierNotFoundException.class,
+                () -> {
+                    orderService.getOrdersBySupplier(999L);
+                });
 
         verify(supplierRepository).existsById(999L);
         verify(purchaseOrderRepository, never()).findBySupplierId(anyLong());
@@ -490,7 +510,8 @@ class OrderServiceTest {
         LocalDate startDate = LocalDate.now().minusDays(7);
         LocalDate endDate = LocalDate.now();
         List<PurchaseOrder> ordersInRange = Arrays.asList(testOrder);
-        when(purchaseOrderRepository.findByOrderDateBetween(startDate, endDate)).thenReturn(ordersInRange);
+        when(purchaseOrderRepository.findByOrderDateBetween(startDate, endDate))
+                .thenReturn(ordersInRange);
 
         // Act
         List<PurchaseOrder> result = orderService.getOrdersByDateRange(startDate, endDate);
