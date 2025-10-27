@@ -5,16 +5,29 @@
 -- Insertar usuario administrador por defecto
 -- Contraseña: admin123 (debe cambiarse en producción)
 -- Hash generado con BCrypt strength 12
+-- Contraseñas: admin123, manager123, operator123
 INSERT INTO users (username, email, password_hash, role, active) VALUES
-('admin', 'admin@kinvex.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/VcQjyN/L6', 'ADMIN', true);
+('admin', 'admin@kinvex.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ADMIN', true),
+('manager', 'manager@kinvex.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'MANAGER', true),
+('operator', 'operator@kinvex.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'OPERATOR', true)
+ON CONFLICT (username) DO NOTHING;
 
--- Insertar categorías básicas del sistema
-INSERT INTO categories (name, description) VALUES
-('Electrónicos', 'Productos electrónicos y tecnológicos'),
-('Oficina', 'Suministros y equipos de oficina'),
-('Limpieza', 'Productos de limpieza y mantenimiento'),
-('Seguridad', 'Equipos y suministros de seguridad'),
-('Herramientas', 'Herramientas y equipos de trabajo');
+-- Insertar categorías básicas del sistema (solo si no existen)
+INSERT INTO categories (name, description)
+SELECT 'Electrónicos', 'Productos electrónicos y tecnológicos'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'Electrónicos')
+UNION ALL
+SELECT 'Oficina', 'Suministros y equipos de oficina'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'Oficina')
+UNION ALL
+SELECT 'Limpieza', 'Productos de limpieza y mantenimiento'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'Limpieza')
+UNION ALL
+SELECT 'Seguridad', 'Equipos y suministros de seguridad'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'Seguridad')
+UNION ALL
+SELECT 'Herramientas', 'Herramientas y equipos de trabajo'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'Herramientas');
 
 -- Insertar subcategorías
 INSERT INTO categories (name, description, parent_id) VALUES
