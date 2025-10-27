@@ -89,23 +89,9 @@ cors:
   allowed-headers: ${CORS_ALLOWED_HEADERS:Authorization,Content-Type,X-Requested-With}
   allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
 
-logging:
-  level:
-    dev.kreaker.kinvex: INFO
-    org.springframework.security: WARN
-    org.springframework.web: WARN
-    org.hibernate.SQL: WARN
-    org.hibernate.type.descriptor.sql.BasicBinder: WARN
-    org.springframework.transaction: WARN
-    org.apache.tomcat: WARN
-    org.apache.catalina: WARN
-  file:
-    name: ${LOG_FILE:/var/log/kinvex/kinvex-core.log}
-  logback:
-    rollingpolicy:
-      max-file-size: ${LOG_MAX_FILE_SIZE:100MB}
-      max-history: ${LOG_MAX_HISTORY:30}
-      total-size-cap: ${LOG_TOTAL_SIZE_CAP:3GB}
+# Logging configurado en logback-spring.xml
+# Variables de entorno para logging:
+# LOG_FILE, LOG_MAX_FILE_SIZE, LOG_MAX_HISTORY, LOG_TOTAL_SIZE_CAP
 
 # Configuraciones específicas para producción
 app:
