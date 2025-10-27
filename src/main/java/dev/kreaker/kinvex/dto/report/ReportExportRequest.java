@@ -1,17 +1,13 @@
 package dev.kreaker.kinvex.dto.report;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import dev.kreaker.kinvex.entity.InventoryMovement.MovementType;
 import dev.kreaker.kinvex.entity.InventoryMovement.ReferenceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.List;
 
-/**
- * DTO for report export requests Requirement 4.5: Export reports in PDF and
- * Excel formats
- */
+/** DTO for report export requests Requirement 4.5: Export reports in PDF and Excel formats */
 @Schema(description = "Request object for exporting reports")
 public class ReportExportRequest {
 
@@ -77,8 +73,7 @@ public class ReportExportRequest {
     }
 
     // Constructors
-    public ReportExportRequest() {
-    }
+    public ReportExportRequest() {}
 
     public ReportExportRequest(ReportType reportType, ExportFormat format) {
         this.reportType = reportType;
@@ -214,9 +209,7 @@ public class ReportExportRequest {
         this.title = title;
     }
 
-    /**
-     * Convert to ReportFilterDto for service layer
-     */
+    /** Convert to ReportFilterDto for service layer */
     public ReportFilterDto toReportFilter() {
         ReportFilterDto filter = new ReportFilterDto();
         filter.setStartDate(this.startDate);
@@ -237,11 +230,17 @@ public class ReportExportRequest {
     @Override
     public String toString() {
         return "ReportExportRequest{"
-                + "reportType=" + reportType
-                + ", format=" + format
-                + ", startDate=" + startDate
-                + ", endDate=" + endDate
-                + ", title='" + title + '\''
+                + "reportType="
+                + reportType
+                + ", format="
+                + format
+                + ", startDate="
+                + startDate
+                + ", endDate="
+                + endDate
+                + ", title='"
+                + title
+                + '\''
                 + '}';
     }
 }

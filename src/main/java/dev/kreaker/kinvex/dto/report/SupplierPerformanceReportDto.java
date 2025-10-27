@@ -4,9 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * DTO for supplier performance reports Requirement 4.3: Show supplier
- * information for each movement Requirement 4.4: Allow filtering reports by
- * supplier
+ * DTO for supplier performance reports Requirement 4.3: Show supplier information for each movement
+ * Requirement 4.4: Allow filtering reports by supplier
  */
 public class SupplierPerformanceReportDto {
 
@@ -239,8 +238,7 @@ public class SupplierPerformanceReportDto {
     }
 
     public boolean hasRecentActivity() {
-        return lastOrderDate != null
-                && lastOrderDate.isAfter(LocalDateTime.now().minusMonths(3));
+        return lastOrderDate != null && lastOrderDate.isAfter(LocalDateTime.now().minusMonths(3));
     }
 
     public boolean hasOverdueOrders() {
@@ -266,13 +264,21 @@ public class SupplierPerformanceReportDto {
     @Override
     public String toString() {
         return "SupplierPerformanceReportDto{"
-                + "supplierId=" + supplierId
-                + ", supplierName='" + supplierName + '\''
-                + ", totalOrders=" + totalOrders
-                + ", completedOrders=" + completedOrders
-                + ", completionRate=" + completionRate
-                + ", totalOrderValue=" + totalOrderValue
-                + ", reportGeneratedAt=" + reportGeneratedAt
+                + "supplierId="
+                + supplierId
+                + ", supplierName='"
+                + supplierName
+                + '\''
+                + ", totalOrders="
+                + totalOrders
+                + ", completedOrders="
+                + completedOrders
+                + ", completionRate="
+                + completionRate
+                + ", totalOrderValue="
+                + totalOrderValue
+                + ", reportGeneratedAt="
+                + reportGeneratedAt
                 + '}';
     }
 

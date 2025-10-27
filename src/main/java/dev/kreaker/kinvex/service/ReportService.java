@@ -1,15 +1,5 @@
 package dev.kreaker.kinvex.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import dev.kreaker.kinvex.dto.report.InventoryMovementReportDto;
 import dev.kreaker.kinvex.dto.report.ReportFilterDto;
 import dev.kreaker.kinvex.dto.report.StockLevelReportDto;
@@ -20,10 +10,17 @@ import dev.kreaker.kinvex.entity.Supplier;
 import dev.kreaker.kinvex.repository.InventoryMovementRepository;
 import dev.kreaker.kinvex.repository.ProductRepository;
 import dev.kreaker.kinvex.repository.SupplierRepository;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service for generating various inventory and supplier reports Requirements:
- * 4.1, 4.2, 4.3, 4.4
+ * Service for generating various inventory and supplier reports Requirements: 4.1, 4.2, 4.3, 4.4
  */
 @Service
 @Transactional(readOnly = true)
@@ -45,19 +42,20 @@ public class ReportService {
     }
 
     /**
-     * Generate inventory movement reports Requirement 4.1: Generate reports of
-     * inbound inventory by time period Requirement 4.2: Generate reports of
-     * outbound inventory by time period
+     * Generate inventory movement reports Requirement 4.1: Generate reports of inbound inventory by
+     * time period Requirement 4.2: Generate reports of outbound inventory by time period
      */
     public List<InventoryMovementReportDto> getInventoryMovementReport(ReportFilterDto filter) {
         logger.info("Generating inventory movement report with filter: {}", filter);
 
         if (!filter.isValidDateRange()) {
-            throw new IllegalArgumentException("Valid date range is required for inventory movement reports");
+            throw new IllegalArgumentException(
+                    "Valid date range is required for inventory movement reports");
         }
 
-        List<InventoryMovement> movements = inventoryMovementRepository
-                .findByCreatedAtBetween(filter.getStartDate(), filter.getEndDate());
+        List<InventoryMovement> movements =
+                inventoryMovementRepository.findByCreatedAtBetween(
+                        filter.getStartDate(), filter.getEndDate());
 
         return movements.stream()
                 .filter(movement -> applyMovementFilters(movement, filter))
@@ -66,37 +64,38 @@ public class ReportService {
     }
 
     /**
-     * Generate detailed inventory movement report with product and user
-     * information Requirement 4.3: Show origin information for each movement
+     * Generate detailed inventory movement report with product and user information Requirement
+     * 4.3: Show origin information for each movement
      */
-    public List<InventoryMovementReportDto> getDetailedInventoryMovementReport(ReportFilterDto filter) {
+    public List<InventoryMovementReportDto> getDetailedInventoryMovementReport(
+            ReportFilterDto filter) {
         logger.info("Generating detailed inventory movement report with filter: {}", filter);
 
         if (!filter.isValidDateRange()) {
-            throw new IllegalArgumentException("Valid date range is required for detailed inventory movement reports");
+            throw new IllegalArgumentException(
+                    "Valid date range is required for detailed inventory movement reports");
         }
 
-        List<InventoryMovement> movements = inventoryMovementRepository
-                .findMovementsBetween(filter.getStartDate(), filter.getEndDate());
+        List<InventoryMovement> movements =
+                inventoryMovementRepository.findMovementsBetween(
+                        filter.getStartDate(), filter.getEndDate());
 
-        List<InventoryMovementReportDto> reportData = movements.stream()
-                .filter(movement -> applyMovementFilters(movement, filter))
-                .map(this::convertToDetailedInventoryMovementReportDto)
-                .collect(Collectors.toList());
+        List<InventoryMovementReportDto> reportData =
+                movements.stream()
+                        .filter(movement -> applyMovementFilters(movement, filter))
+                        .map(this::convertToDetailedInventoryMovementReportDto)
+                        .collect(Collectors.toList());
 
         // Apply limit if specified
         if (filter.getLimit() != null && filter.getLimit() > 0) {
-            return reportData.stream()
-                    .limit(filter.getLimit())
-                    .collect(Collectors.toList());
+            return reportData.stream().limit(filter.getLimit()).collect(Collectors.toList());
         }
 
         return reportData;
     }
 
     /**
-     * Generate stock level reports Requirement 4.2: Generate reports of stock
-     * levels by time period
+     * Generate stock level reports Requirement 4.2: Generate reports of stock levels by time period
      */
     public List<StockLevelReportDto> getStockLevelReport(ReportFilterDto filter) {
         logger.info("Generating stock level report with filter: {}", filter);
@@ -115,15 +114,15 @@ public class ReportService {
     }
 
     /**
-     * Generate supplier performance reports Requirement 4.3: Show supplier
-     * information for each movement Requirement 4.4: Allow filtering reports by
-     * supplier
+     * Generate supplier performance reports Requirement 4.3: Show supplier information for each
+     * movement Requirement 4.4: Allow filtering reports by supplier
      */
     public List<SupplierPerformanceReportDto> getSupplierPerformanceReport(ReportFilterDto filter) {
         logger.info("Generating supplier performance report with filter: {}", filter);
 
         if (!filter.isValidDateRange()) {
-            throw new IllegalArgumentException("Valid date range is required for supplier performance reports");
+            throw new IllegalArgumentException(
+                    "Valid date range is required for supplier performance reports");
         }
 
         List<Supplier> suppliers;
@@ -141,46 +140,45 @@ public class ReportService {
     }
 
     /**
-     * Get product movement summary for a specific time period Requirement 4.4:
-     * Allow filtering reports by product, supplier, or date ranges
+     * Get product movement summary for a specific time period Requirement 4.4: Allow filtering
+     * reports by product, supplier, or date ranges
      */
     public List<Object[]> getProductMovementSummary(ReportFilterDto filter) {
         logger.info("Generating product movement summary with filter: {}", filter);
 
         if (!filter.isValidDateRange()) {
-            throw new IllegalArgumentException("Valid date range is required for product movement summary");
+            throw new IllegalArgumentException(
+                    "Valid date range is required for product movement summary");
         }
 
-        return inventoryMovementRepository
-                .findProductMovementSummaryBetween(filter.getStartDate(), filter.getEndDate());
+        return inventoryMovementRepository.findProductMovementSummaryBetween(
+                filter.getStartDate(), filter.getEndDate());
     }
 
-    /**
-     * Get movement statistics by type and reference
-     */
+    /** Get movement statistics by type and reference */
     public List<Object[]> getMovementStatisticsByType(ReportFilterDto filter) {
         logger.info("Generating movement statistics by type with filter: {}", filter);
 
         if (!filter.isValidDateRange()) {
-            throw new IllegalArgumentException("Valid date range is required for movement statistics");
+            throw new IllegalArgumentException(
+                    "Valid date range is required for movement statistics");
         }
 
-        return inventoryMovementRepository
-                .findMovementStatisticsByTypeBetween(filter.getStartDate(), filter.getEndDate());
+        return inventoryMovementRepository.findMovementStatisticsByTypeBetween(
+                filter.getStartDate(), filter.getEndDate());
     }
 
-    /**
-     * Get daily movement summary
-     */
+    /** Get daily movement summary */
     public List<Object[]> getDailyMovementSummary(ReportFilterDto filter) {
         logger.info("Generating daily movement summary with filter: {}", filter);
 
         if (!filter.isValidDateRange()) {
-            throw new IllegalArgumentException("Valid date range is required for daily movement summary");
+            throw new IllegalArgumentException(
+                    "Valid date range is required for daily movement summary");
         }
 
-        return inventoryMovementRepository
-                .findDailyMovementSummaryBetween(filter.getStartDate(), filter.getEndDate());
+        return inventoryMovementRepository.findDailyMovementSummaryBetween(
+                filter.getStartDate(), filter.getEndDate());
     }
 
     // Private helper methods
@@ -249,7 +247,8 @@ public class ReportService {
         return true;
     }
 
-    private InventoryMovementReportDto convertToInventoryMovementReportDto(InventoryMovement movement) {
+    private InventoryMovementReportDto convertToInventoryMovementReportDto(
+            InventoryMovement movement) {
         return new InventoryMovementReportDto(
                 movement.getId(),
                 movement.getProduct().getCode(),
@@ -257,11 +256,11 @@ public class ReportService {
                 movement.getMovementType(),
                 movement.getQuantity(),
                 movement.getCreatedAt(),
-                movement.getProduct().getUnitPrice()
-        );
+                movement.getProduct().getUnitPrice());
     }
 
-    private InventoryMovementReportDto convertToDetailedInventoryMovementReportDto(InventoryMovement movement) {
+    private InventoryMovementReportDto convertToDetailedInventoryMovementReportDto(
+            InventoryMovement movement) {
         return new InventoryMovementReportDto(
                 movement.getId(),
                 movement.getProduct().getCode(),
@@ -274,34 +273,38 @@ public class ReportService {
                 movement.getNotes(),
                 movement.getCreatedBy() != null ? movement.getCreatedBy().getUsername() : null,
                 movement.getCreatedAt(),
-                movement.getProduct().getUnitPrice()
-        );
+                movement.getProduct().getUnitPrice());
     }
 
-    private StockLevelReportDto convertToStockLevelReportDto(Product product, ReportFilterDto filter) {
+    private StockLevelReportDto convertToStockLevelReportDto(
+            Product product, ReportFilterDto filter) {
         // Get movement data for the period if date range is provided
         Integer inboundMovements = 0;
         Integer outboundMovements = 0;
         LocalDateTime lastMovementDate = null;
 
         if (filter.hasDateRange()) {
-            List<InventoryMovement> movements = inventoryMovementRepository
-                    .findByProductAndCreatedAtBetween(product, filter.getStartDate(), filter.getEndDate());
+            List<InventoryMovement> movements =
+                    inventoryMovementRepository.findByProductAndCreatedAtBetween(
+                            product, filter.getStartDate(), filter.getEndDate());
 
-            inboundMovements = movements.stream()
-                    .filter(m -> m.getMovementType() == InventoryMovement.MovementType.IN)
-                    .mapToInt(InventoryMovement::getQuantity)
-                    .sum();
+            inboundMovements =
+                    movements.stream()
+                            .filter(m -> m.getMovementType() == InventoryMovement.MovementType.IN)
+                            .mapToInt(InventoryMovement::getQuantity)
+                            .sum();
 
-            outboundMovements = movements.stream()
-                    .filter(m -> m.getMovementType() == InventoryMovement.MovementType.OUT)
-                    .mapToInt(InventoryMovement::getQuantity)
-                    .sum();
+            outboundMovements =
+                    movements.stream()
+                            .filter(m -> m.getMovementType() == InventoryMovement.MovementType.OUT)
+                            .mapToInt(InventoryMovement::getQuantity)
+                            .sum();
 
-            lastMovementDate = movements.stream()
-                    .map(InventoryMovement::getCreatedAt)
-                    .max(LocalDateTime::compareTo)
-                    .orElse(null);
+            lastMovementDate =
+                    movements.stream()
+                            .map(InventoryMovement::getCreatedAt)
+                            .max(LocalDateTime::compareTo)
+                            .orElse(null);
         }
 
         return new StockLevelReportDto(
@@ -315,20 +318,22 @@ public class ReportService {
                 product.getUnitPrice(),
                 inboundMovements,
                 outboundMovements,
-                lastMovementDate
-        );
+                lastMovementDate);
     }
 
-    private SupplierPerformanceReportDto convertToSupplierPerformanceReportDto(Supplier supplier, ReportFilterDto filter) {
+    private SupplierPerformanceReportDto convertToSupplierPerformanceReportDto(
+            Supplier supplier, ReportFilterDto filter) {
         // Get supplier performance data from purchase orders
-        List<Object[]> performanceData = supplierRepository
-                .findSupplierPerformanceBetween(filter.getStartDate(), filter.getEndDate());
+        List<Object[]> performanceData =
+                supplierRepository.findSupplierPerformanceBetween(
+                        filter.getStartDate(), filter.getEndDate());
 
         // Find data for this supplier
-        Object[] supplierData = performanceData.stream()
-                .filter(data -> ((Supplier) data[0]).getId().equals(supplier.getId()))
-                .findFirst()
-                .orElse(null);
+        Object[] supplierData =
+                performanceData.stream()
+                        .filter(data -> ((Supplier) data[0]).getId().equals(supplier.getId()))
+                        .findFirst()
+                        .orElse(null);
 
         if (supplierData != null) {
             return new SupplierPerformanceReportDto(
@@ -345,7 +350,7 @@ public class ReportService {
                     (BigDecimal) supplierData[2], // averageOrderValue
                     null, // averageDeliveryDays - would need additional query
                     null // lastOrderDate - would need additional query
-            );
+                    );
         } else {
             // Supplier with no orders in the period
             return new SupplierPerformanceReportDto(
@@ -353,8 +358,7 @@ public class ReportService {
                     supplier.getName(),
                     supplier.getContactPerson(),
                     supplier.getEmail(),
-                    supplier.getPhone()
-            );
+                    supplier.getPhone());
         }
     }
 }

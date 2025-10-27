@@ -1,14 +1,13 @@
 package dev.kreaker.kinvex.dto.report;
 
+import dev.kreaker.kinvex.entity.InventoryMovement.MovementType;
+import dev.kreaker.kinvex.entity.InventoryMovement.ReferenceType;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import dev.kreaker.kinvex.entity.InventoryMovement.MovementType;
-import dev.kreaker.kinvex.entity.InventoryMovement.ReferenceType;
-
 /**
- * DTO for report filtering parameters Requirement 4.4: Allow filtering reports
- * by product, supplier, or date ranges
+ * DTO for report filtering parameters Requirement 4.4: Allow filtering reports by product,
+ * supplier, or date ranges
  */
 public class ReportFilterDto {
 
@@ -191,15 +190,26 @@ public class ReportFilterDto {
     @Override
     public String toString() {
         return "ReportFilterDto{"
-                + "startDate=" + startDate
-                + ", endDate=" + endDate
-                + ", productIds=" + productIds
-                + ", supplierIds=" + supplierIds
-                + ", movementTypes=" + movementTypes
-                + ", activeProductsOnly=" + activeProductsOnly
-                + ", limit=" + limit
-                + ", sortBy='" + sortBy + '\''
-                + ", sortDirection='" + sortDirection + '\''
+                + "startDate="
+                + startDate
+                + ", endDate="
+                + endDate
+                + ", productIds="
+                + productIds
+                + ", supplierIds="
+                + supplierIds
+                + ", movementTypes="
+                + movementTypes
+                + ", activeProductsOnly="
+                + activeProductsOnly
+                + ", limit="
+                + limit
+                + ", sortBy='"
+                + sortBy
+                + '\''
+                + ", sortDirection='"
+                + sortDirection
+                + '\''
                 + '}';
     }
 }

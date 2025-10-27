@@ -3,10 +3,7 @@ package dev.kreaker.kinvex.dto.report;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * DTO for stock level reports Requirement 4.2: Generate reports of stock levels
- * by time period
- */
+/** DTO for stock level reports Requirement 4.2: Generate reports of stock levels by time period */
 public class StockLevelReportDto {
 
     private Long productId;
@@ -66,7 +63,15 @@ public class StockLevelReportDto {
             Integer inboundMovements,
             Integer outboundMovements,
             LocalDateTime lastMovementDate) {
-        this(productId, productCode, productName, categoryName, currentStock, minStock, maxStock, unitPrice);
+        this(
+                productId,
+                productCode,
+                productName,
+                categoryName,
+                currentStock,
+                minStock,
+                maxStock,
+                unitPrice);
         this.inboundMovements = inboundMovements != null ? inboundMovements : 0;
         this.outboundMovements = outboundMovements != null ? outboundMovements : 0;
         this.netMovements = this.inboundMovements - this.outboundMovements;
@@ -250,13 +255,22 @@ public class StockLevelReportDto {
     @Override
     public String toString() {
         return "StockLevelReportDto{"
-                + "productId=" + productId
-                + ", productCode='" + productCode + '\''
-                + ", productName='" + productName + '\''
-                + ", currentStock=" + currentStock
-                + ", stockStatus=" + stockStatus
-                + ", stockValue=" + stockValue
-                + ", reportGeneratedAt=" + reportGeneratedAt
+                + "productId="
+                + productId
+                + ", productCode='"
+                + productCode
+                + '\''
+                + ", productName='"
+                + productName
+                + '\''
+                + ", currentStock="
+                + currentStock
+                + ", stockStatus="
+                + stockStatus
+                + ", stockValue="
+                + stockValue
+                + ", reportGeneratedAt="
+                + reportGeneratedAt
                 + '}';
     }
 

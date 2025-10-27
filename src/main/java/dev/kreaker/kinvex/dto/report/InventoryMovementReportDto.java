@@ -1,14 +1,13 @@
 package dev.kreaker.kinvex.dto.report;
 
+import dev.kreaker.kinvex.entity.InventoryMovement.MovementType;
+import dev.kreaker.kinvex.entity.InventoryMovement.ReferenceType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import dev.kreaker.kinvex.entity.InventoryMovement.MovementType;
-import dev.kreaker.kinvex.entity.InventoryMovement.ReferenceType;
-
 /**
- * DTO for inventory movement reports Requirement 4.1: Generate reports of
- * inventory movements by time period
+ * DTO for inventory movement reports Requirement 4.1: Generate reports of inventory movements by
+ * time period
  */
 public class InventoryMovementReportDto {
 
@@ -27,8 +26,7 @@ public class InventoryMovementReportDto {
     private BigDecimal totalValue;
 
     // Default constructor
-    public InventoryMovementReportDto() {
-    }
+    public InventoryMovementReportDto() {}
 
     // Constructor with essential fields
     public InventoryMovementReportDto(
@@ -46,9 +44,10 @@ public class InventoryMovementReportDto {
         this.quantity = quantity;
         this.createdAt = createdAt;
         this.unitPrice = unitPrice;
-        this.totalValue = unitPrice != null && quantity != null
-                ? unitPrice.multiply(BigDecimal.valueOf(quantity))
-                : BigDecimal.ZERO;
+        this.totalValue =
+                unitPrice != null && quantity != null
+                        ? unitPrice.multiply(BigDecimal.valueOf(quantity))
+                        : BigDecimal.ZERO;
     }
 
     // Full constructor
@@ -198,13 +197,22 @@ public class InventoryMovementReportDto {
     @Override
     public String toString() {
         return "InventoryMovementReportDto{"
-                + "movementId=" + movementId
-                + ", productCode='" + productCode + '\''
-                + ", productName='" + productName + '\''
-                + ", movementType=" + movementType
-                + ", quantity=" + quantity
-                + ", totalValue=" + totalValue
-                + ", createdAt=" + createdAt
+                + "movementId="
+                + movementId
+                + ", productCode='"
+                + productCode
+                + '\''
+                + ", productName='"
+                + productName
+                + '\''
+                + ", movementType="
+                + movementType
+                + ", quantity="
+                + quantity
+                + ", totalValue="
+                + totalValue
+                + ", createdAt="
+                + createdAt
                 + '}';
     }
 }

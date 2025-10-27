@@ -1,22 +1,10 @@
 package dev.kreaker.kinvex.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import static org.mockito.Mockito.when;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import dev.kreaker.kinvex.dto.report.InventoryMovementReportDto;
 import dev.kreaker.kinvex.dto.report.ReportFilterDto;
@@ -30,21 +18,28 @@ import dev.kreaker.kinvex.entity.User;
 import dev.kreaker.kinvex.repository.InventoryMovementRepository;
 import dev.kreaker.kinvex.repository.ProductRepository;
 import dev.kreaker.kinvex.repository.SupplierRepository;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
 
-    @Mock
-    private InventoryMovementRepository inventoryMovementRepository;
+    @Mock private InventoryMovementRepository inventoryMovementRepository;
 
-    @Mock
-    private ProductRepository productRepository;
+    @Mock private ProductRepository productRepository;
 
-    @Mock
-    private SupplierRepository supplierRepository;
+    @Mock private SupplierRepository supplierRepository;
 
-    @InjectMocks
-    private ReportService reportService;
+    @InjectMocks private ReportService reportService;
 
     private Product testProduct;
     private InventoryMovement testMovement;
@@ -96,7 +91,8 @@ class ReportServiceTest {
                 .thenReturn(Arrays.asList(testMovement));
 
         // When
-        List<InventoryMovementReportDto> result = reportService.getInventoryMovementReport(testFilter);
+        List<InventoryMovementReportDto> result =
+                reportService.getInventoryMovementReport(testFilter);
 
         // Then
         assertNotNull(result);
@@ -117,7 +113,8 @@ class ReportServiceTest {
                 .thenReturn(Arrays.asList(testMovement));
 
         // When
-        List<InventoryMovementReportDto> result = reportService.getDetailedInventoryMovementReport(testFilter);
+        List<InventoryMovementReportDto> result =
+                reportService.getDetailedInventoryMovementReport(testFilter);
 
         // Then
         assertNotNull(result);
@@ -160,7 +157,8 @@ class ReportServiceTest {
                 .thenReturn(Arrays.asList());
 
         // When
-        List<SupplierPerformanceReportDto> result = reportService.getSupplierPerformanceReport(testFilter);
+        List<SupplierPerformanceReportDto> result =
+                reportService.getSupplierPerformanceReport(testFilter);
 
         // Then
         assertNotNull(result);
@@ -181,9 +179,11 @@ class ReportServiceTest {
         invalidFilter.setEndDate(null);
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> {
-            reportService.getInventoryMovementReport(invalidFilter);
-        });
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    reportService.getInventoryMovementReport(invalidFilter);
+                });
     }
 
     @Test
@@ -194,9 +194,11 @@ class ReportServiceTest {
         invalidFilter.setEndDate(null);
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> {
-            reportService.getSupplierPerformanceReport(invalidFilter);
-        });
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    reportService.getSupplierPerformanceReport(invalidFilter);
+                });
     }
 
     @Test
@@ -218,7 +220,12 @@ class ReportServiceTest {
     @Test
     void testGetMovementStatisticsByType() {
         // Given
-        Object[] statsData = {InventoryMovement.MovementType.IN, InventoryMovement.ReferenceType.PURCHASE_ORDER, 5L, 250L};
+        Object[] statsData = {
+            InventoryMovement.MovementType.IN,
+            InventoryMovement.ReferenceType.PURCHASE_ORDER,
+            5L,
+            250L
+        };
         when(inventoryMovementRepository.findMovementStatisticsByTypeBetween(any(), any()))
                 .thenReturn(Collections.singletonList(statsData));
 
@@ -245,5 +252,179 @@ class ReportServiceTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(LocalDateTime.now().toLocalDate(), result.get(0)[0]);
+    }
+
+    @Test
+    void testGetInventoryMovementReportWithFilters() {
+        // Given
+        ReportFilterDto filterWithProductIds = new ReportFilterDto();
+        filterWithProductIds.setStartDate(LocalDateTime.now().minusDays(30));
+        filterWithProductIds.setEndDate(LocalDateTime.now());
+        filterWithProductIds.setProductIds(Arrays.asList(1L, 2L));
+        filterWithProductIds.setMovementTypes(Arrays.asList(InventoryMovement.MovementType.IN));
+
+        when(inventoryMovementRepository.findByCreatedAtBetween(any(), any()))
+                .thenReturn(Arrays.asList(testMovement));
+
+        // When
+        List<InventoryMovementReportDto> result =
+                reportService.getInventoryMovementReport(filterWithProductIds);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testGetStockLevelReportWithCategoryFilter() {
+        // Given
+        ReportFilterDto filterWithCategory = new ReportFilterDto();
+        filterWithCategory.setCategoryIds(Arrays.asList(1L));
+        filterWithCategory.setActiveProductsOnly(true);
+
+        when(productRepository.findByActiveTrue()).thenReturn(Arrays.asList(testProduct));
+
+        // When
+        List<StockLevelReportDto> result = reportService.getStockLevelReport(filterWithCategory);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Test Category", result.get(0).getCategoryName());
+    }
+
+    @Test
+    void testGetSupplierPerformanceReportWithSupplierFilter() {
+        // Given
+        ReportFilterDto filterWithSuppliers = new ReportFilterDto();
+        filterWithSuppliers.setStartDate(LocalDateTime.now().minusDays(30));
+        filterWithSuppliers.setEndDate(LocalDateTime.now());
+        filterWithSuppliers.setSupplierIds(Arrays.asList(1L));
+
+        when(supplierRepository.findAllById(any())).thenReturn(Arrays.asList(testSupplier));
+        when(supplierRepository.findSupplierPerformanceBetween(any(), any()))
+                .thenReturn(Arrays.asList());
+
+        // When
+        List<SupplierPerformanceReportDto> result =
+                reportService.getSupplierPerformanceReport(filterWithSuppliers);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Test Supplier", result.get(0).getSupplierName());
+    }
+
+    @Test
+    void testGetDetailedInventoryMovementReportWithLimit() {
+        // Given
+        ReportFilterDto filterWithLimit = new ReportFilterDto();
+        filterWithLimit.setStartDate(LocalDateTime.now().minusDays(30));
+        filterWithLimit.setEndDate(LocalDateTime.now());
+        filterWithLimit.setLimit(1);
+
+        InventoryMovement movement2 =
+                new InventoryMovement(testProduct, InventoryMovement.MovementType.OUT, 25);
+        movement2.setId(2L);
+        movement2.setCreatedAt(LocalDateTime.now());
+
+        when(inventoryMovementRepository.findMovementsBetween(any(), any()))
+                .thenReturn(Arrays.asList(testMovement, movement2));
+
+        // When
+        List<InventoryMovementReportDto> result =
+                reportService.getDetailedInventoryMovementReport(filterWithLimit);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.size()); // Limited to 1 result
+    }
+
+    @Test
+    void testGetStockLevelReportWithInactiveProducts() {
+        // Given
+        ReportFilterDto filterInactiveProducts = new ReportFilterDto();
+        filterInactiveProducts.setActiveProductsOnly(false);
+
+        Product inactiveProduct =
+                new Product("INACTIVE001", "Inactive Product", new BigDecimal("5.00"));
+        inactiveProduct.setId(2L);
+        inactiveProduct.setActive(false);
+
+        when(productRepository.findAll()).thenReturn(Arrays.asList(testProduct, inactiveProduct));
+
+        // When
+        List<StockLevelReportDto> result =
+                reportService.getStockLevelReport(filterInactiveProducts);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(2, result.size()); // Should include both active and inactive products
+    }
+
+    @Test
+    void testGetSupplierPerformanceReportWithPerformanceData() {
+        // Given
+        Object[] performanceData = {testSupplier, 5, new BigDecimal("500.00"), 4, 1};
+        when(supplierRepository.findByActiveTrue()).thenReturn(Arrays.asList(testSupplier));
+        when(supplierRepository.findSupplierPerformanceBetween(any(), any()))
+                .thenReturn(Collections.singletonList(performanceData));
+
+        // When
+        List<SupplierPerformanceReportDto> result =
+                reportService.getSupplierPerformanceReport(testFilter);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        SupplierPerformanceReportDto reportDto = result.get(0);
+        assertEquals(5, reportDto.getTotalOrders());
+        assertEquals(4, reportDto.getCompletedOrders());
+        assertEquals(1, reportDto.getCancelledOrders());
+    }
+
+    @Test
+    void testGetProductMovementSummaryWithInvalidDateRange() {
+        // Given
+        ReportFilterDto invalidFilter = new ReportFilterDto();
+        invalidFilter.setStartDate(null);
+        invalidFilter.setEndDate(null);
+
+        // When & Then
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    reportService.getProductMovementSummary(invalidFilter);
+                });
+    }
+
+    @Test
+    void testGetMovementStatisticsByTypeWithInvalidDateRange() {
+        // Given
+        ReportFilterDto invalidFilter = new ReportFilterDto();
+        invalidFilter.setStartDate(null);
+        invalidFilter.setEndDate(null);
+
+        // When & Then
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    reportService.getMovementStatisticsByType(invalidFilter);
+                });
+    }
+
+    @Test
+    void testGetDailyMovementSummaryWithInvalidDateRange() {
+        // Given
+        ReportFilterDto invalidFilter = new ReportFilterDto();
+        invalidFilter.setStartDate(null);
+        invalidFilter.setEndDate(null);
+
+        // When & Then
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    reportService.getDailyMovementSummary(invalidFilter);
+                });
     }
 }
