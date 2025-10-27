@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import dev.kreaker.kinvex.audit.AuditHelper;
 import dev.kreaker.kinvex.config.JwtProperties;
 import dev.kreaker.kinvex.dto.auth.AuthResponse;
 import dev.kreaker.kinvex.dto.auth.LoginRequest;
@@ -40,6 +41,8 @@ class AuthServiceTest {
 
     @Mock private JwtProperties jwtProperties;
 
+    @Mock private AuditHelper auditHelper;
+
     private AuthService authService;
 
     private User testUser;
@@ -47,7 +50,12 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         authService =
-                new AuthService(userRepository, passwordEncoder, jwtTokenProvider, jwtProperties);
+                new AuthService(
+                        userRepository,
+                        passwordEncoder,
+                        jwtTokenProvider,
+                        jwtProperties,
+                        auditHelper);
 
         testUser = new User();
         testUser.setId(1L);

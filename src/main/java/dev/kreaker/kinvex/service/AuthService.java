@@ -1,5 +1,6 @@
 package dev.kreaker.kinvex.service;
 
+import dev.kreaker.kinvex.audit.AuditHelper;
 import dev.kreaker.kinvex.config.JwtProperties;
 import dev.kreaker.kinvex.dto.auth.AuthResponse;
 import dev.kreaker.kinvex.dto.auth.LoginRequest;
@@ -34,6 +35,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtProperties jwtProperties;
+    private final AuditHelper auditHelper;
 
     // Set para mantener tokens invalidados (blacklist)
     // En producción, esto debería ser un cache distribuido como Redis
@@ -43,11 +45,13 @@ public class AuthService {
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtTokenProvider jwtTokenProvider,
-            JwtProperties jwtProperties) {
+            JwtProperties jwtProperties,
+            AuditHelper auditHelper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.jwtProperties = jwtProperties;
+        this.auditHelper = auditHelper;
     }
 
     /**
@@ -65,6 +69,7 @@ public class AuthService {
 
         if (userOptional.isEmpty()) {
             logger.warn("Usuario no encontrado: {}", loginRequest.getUsername());
+            auditHelper.logFailedLogin(loginRequest.getUsername());
             throw new AuthenticationException("Credenciales inválidas");
         }
 
@@ -73,12 +78,14 @@ public class AuthService {
         // Verificar que el usuario esté activo
         if (!user.getActive()) {
             logger.warn("Usuario inactivo intentó hacer login: {}", loginRequest.getUsername());
+            auditHelper.logFailedLogin(loginRequest.getUsername());
             throw new AuthenticationException("Usuario inactivo");
         }
 
         // Verificar contraseña
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())) {
             logger.warn("Contraseña incorrecta para usuario: {}", loginRequest.getUsername());
+            auditHelper.logFailedLogin(loginRequest.getUsername());
             throw new AuthenticationException("Credenciales inválidas");
         }
 
@@ -93,6 +100,7 @@ public class AuthService {
                         user.getId(), user.getUsername(), user.getEmail(), user.getRole());
 
         logger.info("Login exitoso para usuario: {}", user.getUsername());
+        auditHelper.logSuccessfulLogin(user.getUsername());
 
         return new AuthResponse(accessToken, refreshToken, jwtProperties.expiration(), userInfo);
     }
@@ -175,6 +183,7 @@ public class AuthService {
             invalidatedTokens.add(refreshToken);
 
             logger.info("Logout exitoso para usuario: {}", username);
+            auditHelper.logLogout(username);
         } else {
             logger.warn("Intento de logout con refresh token inválido");
             throw new InvalidTokenException("Refresh token inválido");

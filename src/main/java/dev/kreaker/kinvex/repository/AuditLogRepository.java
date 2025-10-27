@@ -62,7 +62,7 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
             @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     @Query(
-            "SELECT DATE(al.createdAt), COUNT(al) FROM AuditLog al WHERE al.createdAt BETWEEN :startDate AND :endDate GROUP BY DATE(al.createdAt) ORDER BY DATE(al.createdAt)")
+            "SELECT CAST(al.createdAt AS date), COUNT(al) FROM AuditLog al WHERE al.createdAt BETWEEN :startDate AND :endDate GROUP BY CAST(al.createdAt AS date) ORDER BY CAST(al.createdAt AS date)")
     List<Object[]> findDailyActivityBetween(
             @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
