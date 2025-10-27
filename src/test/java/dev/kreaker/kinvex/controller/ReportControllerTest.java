@@ -31,11 +31,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 /** Unit tests for ReportController Requirements: 4.1, 4.2, 4.4, 4.5 */
 @WebMvcTest(ReportController.class)
+@EnableMethodSecurity(prePostEnabled = true)
 class ReportControllerTest {
 
     @Autowired private MockMvc mockMvc;
@@ -43,6 +45,8 @@ class ReportControllerTest {
     @MockBean private ReportService reportService;
 
     @MockBean private ReportExportService reportExportService;
+
+    @MockBean private dev.kreaker.kinvex.security.JwtTokenProvider jwtTokenProvider;
 
     @Autowired private ObjectMapper objectMapper;
 

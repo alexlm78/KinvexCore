@@ -50,11 +50,11 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long> {
 
     @Query(
             "SELECT s, AVG(CASE WHEN po.receivedDate IS NOT NULL AND po.expectedDate IS NOT NULL "
-                    + "THEN DATEDIFF('DAY', po.expectedDate, po.receivedDate) ELSE NULL END) as avgDeliveryDelay "
+                    + "THEN TIMESTAMPDIFF(DAY, po.expectedDate, po.receivedDate) ELSE NULL END) as avgDeliveryDelay "
                     + "FROM Supplier s LEFT JOIN s.purchaseOrders po "
                     + "WHERE po.status = 'COMPLETED' AND po.createdAt BETWEEN :startDate AND :endDate "
                     + "GROUP BY s HAVING AVG(CASE WHEN po.receivedDate IS NOT NULL AND po.expectedDate IS NOT NULL "
-                    + "THEN DATEDIFF('DAY', po.expectedDate, po.receivedDate) ELSE NULL END) IS NOT NULL "
+                    + "THEN TIMESTAMPDIFF(DAY, po.expectedDate, po.receivedDate) ELSE NULL END) IS NOT NULL "
                     + "ORDER BY avgDeliveryDelay")
     List<Object[]> findSupplierDeliveryPerformanceBetween(
             @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
