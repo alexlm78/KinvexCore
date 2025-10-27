@@ -42,6 +42,7 @@ import dev.kreaker.kinvex.entity.User;
 import dev.kreaker.kinvex.exception.DuplicateOrderNumberException;
 import dev.kreaker.kinvex.exception.InvalidOrderOperationException;
 import dev.kreaker.kinvex.exception.OrderNotFoundException;
+import dev.kreaker.kinvex.exception.OrderStateConflictException;
 import dev.kreaker.kinvex.exception.ProductNotFoundException;
 import dev.kreaker.kinvex.exception.SupplierNotFoundException;
 import dev.kreaker.kinvex.repository.InventoryMovementRepository;
@@ -319,7 +320,7 @@ class OrderServiceTest {
         when(purchaseOrderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
 
         // Act & Assert
-        assertThrows(InvalidOrderOperationException.class, () -> {
+        assertThrows(OrderStateConflictException.class, () -> {
             orderService.receiveOrder(1L, receiveOrderRequest);
         });
 
@@ -405,7 +406,7 @@ class OrderServiceTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals("SUCCESS", result.getStatus());
+        assertEquals("PARTIAL", result.getStatus().toString());
         assertEquals(1L, result.getOrderId());
         assertEquals("PO001", result.getOrderNumber());
         assertEquals(1, result.getReceivedDetails().size());

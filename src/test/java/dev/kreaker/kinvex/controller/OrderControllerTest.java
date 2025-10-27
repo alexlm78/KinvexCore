@@ -31,6 +31,7 @@ import dev.kreaker.kinvex.entity.User;
 import dev.kreaker.kinvex.exception.DuplicateOrderNumberException;
 import dev.kreaker.kinvex.exception.InvalidOrderOperationException;
 import dev.kreaker.kinvex.exception.OrderNotFoundException;
+import dev.kreaker.kinvex.exception.OrderStateConflictException;
 import dev.kreaker.kinvex.exception.ProductNotFoundException;
 import dev.kreaker.kinvex.exception.SupplierNotFoundException;
 import dev.kreaker.kinvex.service.OrderService;
@@ -343,7 +344,7 @@ class OrderControllerTest {
                 .content(objectMapper.writeValueAsString(receiveOrderRequest)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status", is("SUCCESS")))
+                .andExpect(jsonPath("$.status", is("PARTIAL")))
                 .andExpect(jsonPath("$.orderId", is(1)))
                 .andExpect(jsonPath("$.orderNumber", is("PO001")))
                 .andExpect(jsonPath("$.receivedDetails", hasSize(1)))
@@ -355,7 +356,7 @@ class OrderControllerTest {
     void receiveOrder_WithCancelledOrder_ShouldReturnConflict() throws Exception {
         // Arrange
         when(orderService.receiveOrder(eq(1L), any(ReceiveOrderRequest.class)))
-                .thenThrow(new InvalidOrderOperationException("Cannot receive products from cancelled order"));
+                .thenThrow(new OrderStateConflictException("Cannot receive products from cancelled order"));
 
         // Act & Assert
         mockMvc.perform(post("/api/orders/1/receive")

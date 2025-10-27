@@ -1,5 +1,15 @@
 package dev.kreaker.kinvex.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,12 +25,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "products")
@@ -77,13 +81,16 @@ public class Product {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<OrderDetail> orderDetails = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<InventoryMovement> inventoryMovements = new ArrayList<>();
 
     // Default constructor
-    public Product() {}
+    public Product() {
+    }
 
     // Constructor with required fields
     public Product(String code, String name, BigDecimal unitPrice) {

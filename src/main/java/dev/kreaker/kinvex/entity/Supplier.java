@@ -1,5 +1,13 @@
 package dev.kreaker.kinvex.entity;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,10 +19,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "suppliers")
@@ -54,10 +58,12 @@ public class Supplier {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "supplier", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<PurchaseOrder> purchaseOrders = new ArrayList<>();
 
     // Default constructor
-    public Supplier() {}
+    public Supplier() {
+    }
 
     // Constructor with required fields
     public Supplier(String name) {

@@ -1,5 +1,15 @@
 package dev.kreaker.kinvex.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,12 +26,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "purchase_orders")
@@ -71,10 +75,12 @@ public class PurchaseOrder {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("order-orderDetails")
     private List<OrderDetail> orderDetails = new ArrayList<>();
 
     // Default constructor
-    public PurchaseOrder() {}
+    public PurchaseOrder() {
+    }
 
     // Constructor with required fields
     public PurchaseOrder(String orderNumber, Supplier supplier, LocalDate orderDate) {
@@ -208,8 +214,8 @@ public class PurchaseOrder {
     }
 
     public void calculateTotalAmount() {
-        this.totalAmount =
-                orderDetails.stream()
+        this.totalAmount
+                = orderDetails.stream()
                         .map(OrderDetail::getTotalPrice)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
