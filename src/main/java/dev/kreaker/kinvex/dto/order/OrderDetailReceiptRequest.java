@@ -3,10 +3,7 @@ package dev.kreaker.kinvex.dto.order;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-/**
- * DTO para registrar la cantidad recibida de un producto específico en una
- * orden.
- */
+/** DTO para registrar la cantidad recibida de un producto específico en una orden. */
 public class OrderDetailReceiptRequest {
 
     @NotNull(message = "El ID del detalle de orden es obligatorio")
@@ -17,8 +14,7 @@ public class OrderDetailReceiptRequest {
     private Integer quantityReceived;
 
     // Default constructor
-    public OrderDetailReceiptRequest() {
-    }
+    public OrderDetailReceiptRequest() {}
 
     // Constructor with all fields
     public OrderDetailReceiptRequest(Long orderDetailId, Integer quantityReceived) {
@@ -46,8 +42,10 @@ public class OrderDetailReceiptRequest {
     @Override
     public String toString() {
         return "OrderDetailReceiptRequest{"
-                + "orderDetailId=" + orderDetailId
-                + ", quantityReceived=" + quantityReceived
+                + "orderDetailId="
+                + orderDetailId
+                + ", quantityReceived="
+                + quantityReceived
                 + '}';
     }
 }

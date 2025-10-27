@@ -5,8 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /**
- * DTO para actualizar el estado de una orden de compra. Implementa el
- * requerimiento 3.4: Actualizar el estado de las órdenes de compra.
+ * DTO para actualizar el estado de una orden de compra. Implementa el requerimiento 3.4: Actualizar
+ * el estado de las órdenes de compra.
  */
 public class UpdateOrderStatusRequest {
 
@@ -17,8 +17,7 @@ public class UpdateOrderStatusRequest {
     private String notes;
 
     // Default constructor
-    public UpdateOrderStatusRequest() {
-    }
+    public UpdateOrderStatusRequest() {}
 
     // Constructor with required fields
     public UpdateOrderStatusRequest(OrderStatus status) {
@@ -50,9 +49,6 @@ public class UpdateOrderStatusRequest {
 
     @Override
     public String toString() {
-        return "UpdateOrderStatusRequest{"
-                + "status=" + status
-                + ", notes='" + notes + '\''
-                + '}';
+        return "UpdateOrderStatusRequest{" + "status=" + status + ", notes='" + notes + '\'' + '}';
     }
 }

@@ -1,14 +1,11 @@
 package dev.kreaker.kinvex.dto.order;
 
-import java.math.BigDecimal;
-
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
-/**
- * DTO para los detalles de productos en una orden de compra.
- */
+/** DTO para los detalles de productos en una orden de compra. */
 public class OrderDetailRequest {
 
     @NotNull(message = "El ID del producto es obligatorio")
@@ -23,8 +20,7 @@ public class OrderDetailRequest {
     private BigDecimal unitPrice;
 
     // Default constructor
-    public OrderDetailRequest() {
-    }
+    public OrderDetailRequest() {}
 
     // Constructor with all fields
     public OrderDetailRequest(Long productId, Integer quantityOrdered, BigDecimal unitPrice) {
@@ -61,9 +57,12 @@ public class OrderDetailRequest {
     @Override
     public String toString() {
         return "OrderDetailRequest{"
-                + "productId=" + productId
-                + ", quantityOrdered=" + quantityOrdered
-                + ", unitPrice=" + unitPrice
+                + "productId="
+                + productId
+                + ", quantityOrdered="
+                + quantityOrdered
+                + ", unitPrice="
+                + unitPrice
                 + '}';
     }
 }

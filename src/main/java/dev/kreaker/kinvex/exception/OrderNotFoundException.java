@@ -1,8 +1,6 @@
 package dev.kreaker.kinvex.exception;
 
-/**
- * Excepción lanzada cuando no se encuentra una orden de compra.
- */
+/** Excepción lanzada cuando no se encuentra una orden de compra. */
 public class OrderNotFoundException extends RuntimeException {
 
     public OrderNotFoundException(Long orderId) {

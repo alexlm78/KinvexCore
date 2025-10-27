@@ -1,8 +1,6 @@
 package dev.kreaker.kinvex.dto.order;
 
-/**
- * DTO de respuesta para los detalles de recepción de productos.
- */
+/** DTO de respuesta para los detalles de recepción de productos. */
 public class OrderDetailReceiptResponse {
 
     private Long orderDetailId;
@@ -17,14 +15,19 @@ public class OrderDetailReceiptResponse {
     private boolean fullyReceived;
 
     // Default constructor
-    public OrderDetailReceiptResponse() {
-    }
+    public OrderDetailReceiptResponse() {}
 
     // Constructor with all fields
-    public OrderDetailReceiptResponse(Long orderDetailId, Long productId, String productCode,
-            String productName, Integer quantityOrdered,
-            Integer quantityPreviouslyReceived, Integer quantityReceived,
-            Integer quantityTotalReceived, Integer quantityPending,
+    public OrderDetailReceiptResponse(
+            Long orderDetailId,
+            Long productId,
+            String productCode,
+            String productName,
+            Integer quantityOrdered,
+            Integer quantityPreviouslyReceived,
+            Integer quantityReceived,
+            Integer quantityTotalReceived,
+            Integer quantityPending,
             boolean fullyReceived) {
         this.orderDetailId = orderDetailId;
         this.productId = productId;
@@ -122,16 +125,28 @@ public class OrderDetailReceiptResponse {
     @Override
     public String toString() {
         return "OrderDetailReceiptResponse{"
-                + "orderDetailId=" + orderDetailId
-                + ", productId=" + productId
-                + ", productCode='" + productCode + '\''
-                + ", productName='" + productName + '\''
-                + ", quantityOrdered=" + quantityOrdered
-                + ", quantityPreviouslyReceived=" + quantityPreviouslyReceived
-                + ", quantityReceived=" + quantityReceived
-                + ", quantityTotalReceived=" + quantityTotalReceived
-                + ", quantityPending=" + quantityPending
-                + ", fullyReceived=" + fullyReceived
+                + "orderDetailId="
+                + orderDetailId
+                + ", productId="
+                + productId
+                + ", productCode='"
+                + productCode
+                + '\''
+                + ", productName='"
+                + productName
+                + '\''
+                + ", quantityOrdered="
+                + quantityOrdered
+                + ", quantityPreviouslyReceived="
+                + quantityPreviouslyReceived
+                + ", quantityReceived="
+                + quantityReceived
+                + ", quantityTotalReceived="
+                + quantityTotalReceived
+                + ", quantityPending="
+                + quantityPending
+                + ", fullyReceived="
+                + fullyReceived
                 + '}';
     }
 }

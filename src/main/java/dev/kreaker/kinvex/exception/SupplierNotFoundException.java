@@ -1,8 +1,6 @@
 package dev.kreaker.kinvex.exception;
 
-/**
- * Excepción lanzada cuando no se encuentra un proveedor.
- */
+/** Excepción lanzada cuando no se encuentra un proveedor. */
 public class SupplierNotFoundException extends RuntimeException {
 
     public SupplierNotFoundException(Long supplierId) {

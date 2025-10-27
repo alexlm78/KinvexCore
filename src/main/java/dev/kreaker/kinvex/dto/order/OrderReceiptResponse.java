@@ -5,9 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * DTO de respuesta para la recepción de una orden de compra.
- */
+/** DTO de respuesta para la recepción de una orden de compra. */
 public class OrderReceiptResponse {
 
     private Long orderId;
@@ -20,13 +18,18 @@ public class OrderReceiptResponse {
     private boolean fullyReceived;
 
     // Default constructor
-    public OrderReceiptResponse() {
-    }
+    public OrderReceiptResponse() {}
 
     // Constructor with all fields
-    public OrderReceiptResponse(Long orderId, String orderNumber, OrderStatus status,
-            LocalDate receivedDate, LocalDateTime processedAt, String notes,
-            List<OrderDetailReceiptResponse> receivedDetails, boolean fullyReceived) {
+    public OrderReceiptResponse(
+            Long orderId,
+            String orderNumber,
+            OrderStatus status,
+            LocalDate receivedDate,
+            LocalDateTime processedAt,
+            String notes,
+            List<OrderDetailReceiptResponse> receivedDetails,
+            boolean fullyReceived) {
         this.orderId = orderId;
         this.orderNumber = orderNumber;
         this.status = status;
@@ -38,12 +41,23 @@ public class OrderReceiptResponse {
     }
 
     // Static factory method for success response
-    public static OrderReceiptResponse success(Long orderId, String orderNumber, OrderStatus status,
-            LocalDate receivedDate, String notes,
+    public static OrderReceiptResponse success(
+            Long orderId,
+            String orderNumber,
+            OrderStatus status,
+            LocalDate receivedDate,
+            String notes,
             List<OrderDetailReceiptResponse> receivedDetails,
             boolean fullyReceived) {
-        return new OrderReceiptResponse(orderId, orderNumber, status, receivedDate,
-                LocalDateTime.now(), notes, receivedDetails, fullyReceived);
+        return new OrderReceiptResponse(
+                orderId,
+                orderNumber,
+                status,
+                receivedDate,
+                LocalDateTime.now(),
+                notes,
+                receivedDetails,
+                fullyReceived);
     }
 
     // Getters and Setters
@@ -114,14 +128,24 @@ public class OrderReceiptResponse {
     @Override
     public String toString() {
         return "OrderReceiptResponse{"
-                + "orderId=" + orderId
-                + ", orderNumber='" + orderNumber + '\''
-                + ", status=" + status
-                + ", receivedDate=" + receivedDate
-                + ", processedAt=" + processedAt
-                + ", notes='" + notes + '\''
-                + ", receivedDetails=" + receivedDetails
-                + ", fullyReceived=" + fullyReceived
+                + "orderId="
+                + orderId
+                + ", orderNumber='"
+                + orderNumber
+                + '\''
+                + ", status="
+                + status
+                + ", receivedDate="
+                + receivedDate
+                + ", processedAt="
+                + processedAt
+                + ", notes='"
+                + notes
+                + '\''
+                + ", receivedDetails="
+                + receivedDetails
+                + ", fullyReceived="
+                + fullyReceived
                 + '}';
     }
 }

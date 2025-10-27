@@ -9,9 +9,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * DTO para crear una nueva orden de compra. Implementa el requerimiento 3.1:
- * Crear órdenes de compra especificando proveedor, productos, cantidades y
- * fechas esperadas.
+ * DTO para crear una nueva orden de compra. Implementa el requerimiento 3.1: Crear órdenes de
+ * compra especificando proveedor, productos, cantidades y fechas esperadas.
  */
 public class CreateOrderRequest {
 
@@ -35,11 +34,14 @@ public class CreateOrderRequest {
     private List<OrderDetailRequest> orderDetails;
 
     // Default constructor
-    public CreateOrderRequest() {
-    }
+    public CreateOrderRequest() {}
 
     // Constructor with required fields
-    public CreateOrderRequest(Long supplierId, String orderNumber, LocalDate orderDate, List<OrderDetailRequest> orderDetails) {
+    public CreateOrderRequest(
+            Long supplierId,
+            String orderNumber,
+            LocalDate orderDate,
+            List<OrderDetailRequest> orderDetails) {
         this.supplierId = supplierId;
         this.orderNumber = orderNumber;
         this.orderDate = orderDate;
@@ -98,12 +100,20 @@ public class CreateOrderRequest {
     @Override
     public String toString() {
         return "CreateOrderRequest{"
-                + "supplierId=" + supplierId
-                + ", orderNumber='" + orderNumber + '\''
-                + ", orderDate=" + orderDate
-                + ", expectedDate=" + expectedDate
-                + ", notes='" + notes + '\''
-                + ", orderDetails=" + orderDetails
+                + "supplierId="
+                + supplierId
+                + ", orderNumber='"
+                + orderNumber
+                + '\''
+                + ", orderDate="
+                + orderDate
+                + ", expectedDate="
+                + expectedDate
+                + ", notes='"
+                + notes
+                + '\''
+                + ", orderDetails="
+                + orderDetails
                 + '}';
     }
 }

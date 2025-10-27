@@ -1,19 +1,5 @@
 package dev.kreaker.kinvex.service;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import dev.kreaker.kinvex.dto.order.CreateOrderRequest;
 import dev.kreaker.kinvex.dto.order.OrderDetailReceiptRequest;
 import dev.kreaker.kinvex.dto.order.OrderDetailReceiptResponse;
@@ -38,17 +24,27 @@ import dev.kreaker.kinvex.repository.ProductRepository;
 import dev.kreaker.kinvex.repository.PurchaseOrderRepository;
 import dev.kreaker.kinvex.repository.SupplierRepository;
 import dev.kreaker.kinvex.repository.UserRepository;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Servicio de órdenes de compra que maneja la creación, gestión y recepción de
- * órdenes.
+ * Servicio de órdenes de compra que maneja la creación, gestión y recepción de órdenes.
  *
- * Implementa los requerimientos: - 3.1: Crear órdenes de compra especificando
- * proveedor, productos, cantidades y fechas esperadas - 3.2: Registrar la
- * recepción parcial o total de productos de una orden de compra - 3.3:
- * Incrementar el stock de los productos recibidos cuando se registre una
- * recepción - 3.4: Actualizar el estado de las órdenes de compra (pendiente,
- * parcial, completada, cancelada)
+ * <p>Implementa los requerimientos: - 3.1: Crear órdenes de compra especificando proveedor,
+ * productos, cantidades y fechas esperadas - 3.2: Registrar la recepción parcial o total de
+ * productos de una orden de compra - 3.3: Incrementar el stock de los productos recibidos cuando se
+ * registre una recepción - 3.4: Actualizar el estado de las órdenes de compra (pendiente, parcial,
+ * completada, cancelada)
  */
 @Service
 @Transactional
@@ -80,8 +76,8 @@ public class OrderService {
 
     // ========== CRUD Operations ==========
     /**
-     * Crea una nueva orden de compra. Requerimiento 3.1: Crear órdenes de
-     * compra especificando proveedor, productos, cantidades y fechas esperadas.
+     * Crea una nueva orden de compra. Requerimiento 3.1: Crear órdenes de compra especificando
+     * proveedor, productos, cantidades y fechas esperadas.
      *
      * @param request Datos de la orden a crear
      * @return Orden de compra creada
@@ -98,25 +94,28 @@ public class OrderService {
         }
 
         // Buscar proveedor
-        Supplier supplier = supplierRepository.findById(request.getSupplierId())
-                .orElseThrow(() -> new SupplierNotFoundException(request.getSupplierId()));
+        Supplier supplier =
+                supplierRepository
+                        .findById(request.getSupplierId())
+                        .orElseThrow(() -> new SupplierNotFoundException(request.getSupplierId()));
 
         // Validar que el proveedor esté activo
         if (!supplier.getActive()) {
-            throw new SupplierNotFoundException("Proveedor inactivo con ID: " + request.getSupplierId());
+            throw new SupplierNotFoundException(
+                    "Proveedor inactivo con ID: " + request.getSupplierId());
         }
 
         // Obtener usuario actual
         User currentUser = getCurrentUser();
 
         // Crear orden de compra
-        PurchaseOrder order = new PurchaseOrder(
-                request.getOrderNumber(),
-                supplier,
-                request.getOrderDate(),
-                request.getExpectedDate(),
-                currentUser
-        );
+        PurchaseOrder order =
+                new PurchaseOrder(
+                        request.getOrderNumber(),
+                        supplier,
+                        request.getOrderDate(),
+                        request.getExpectedDate(),
+                        currentUser);
         order.setNotes(request.getNotes());
 
         // Guardar orden para obtener ID
@@ -125,20 +124,26 @@ public class OrderService {
         // Crear detalles de orden
         List<OrderDetail> orderDetails = new ArrayList<>();
         for (var detailRequest : request.getOrderDetails()) {
-            Product product = productRepository.findById(detailRequest.getProductId())
-                    .orElseThrow(() -> new ProductNotFoundException(detailRequest.getProductId()));
+            Product product =
+                    productRepository
+                            .findById(detailRequest.getProductId())
+                            .orElseThrow(
+                                    () ->
+                                            new ProductNotFoundException(
+                                                    detailRequest.getProductId()));
 
             // Validar que el producto esté activo
             if (!product.getActive()) {
-                throw new ProductNotFoundException("Producto inactivo con ID: " + detailRequest.getProductId());
+                throw new ProductNotFoundException(
+                        "Producto inactivo con ID: " + detailRequest.getProductId());
             }
 
-            OrderDetail detail = new OrderDetail(
-                    order,
-                    product,
-                    detailRequest.getQuantityOrdered(),
-                    detailRequest.getUnitPrice()
-            );
+            OrderDetail detail =
+                    new OrderDetail(
+                            order,
+                            product,
+                            detailRequest.getQuantityOrdered(),
+                            detailRequest.getUnitPrice());
             orderDetails.add(detail);
         }
 
@@ -150,8 +155,10 @@ public class OrderService {
         order.calculateTotalAmount();
         order = purchaseOrderRepository.save(order);
 
-        logger.info("Orden de compra creada exitosamente: {} (ID: {})",
-                order.getOrderNumber(), order.getId());
+        logger.info(
+                "Orden de compra creada exitosamente: {} (ID: {})",
+                order.getOrderNumber(),
+                order.getId());
         return order;
     }
 
@@ -164,7 +171,8 @@ public class OrderService {
      */
     @Transactional(readOnly = true)
     public PurchaseOrder getOrderById(Long orderId) {
-        return purchaseOrderRepository.findById(orderId)
+        return purchaseOrderRepository
+                .findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
@@ -177,7 +185,8 @@ public class OrderService {
      */
     @Transactional(readOnly = true)
     public PurchaseOrder getOrderByNumber(String orderNumber) {
-        return purchaseOrderRepository.findByOrderNumber(orderNumber)
+        return purchaseOrderRepository
+                .findByOrderNumber(orderNumber)
                 .orElseThrow(() -> new OrderNotFoundException(orderNumber));
     }
 
@@ -222,21 +231,22 @@ public class OrderService {
 
     // ========== Order Status Management ==========
     /**
-     * Actualiza el estado de una orden de compra. Requerimiento 3.4: Actualizar
-     * el estado de las órdenes de compra.
+     * Actualiza el estado de una orden de compra. Requerimiento 3.4: Actualizar el estado de las
+     * órdenes de compra.
      *
      * @param orderId ID de la orden
      * @param request Datos de actualización del estado
      * @return Orden actualizada
      * @throws OrderNotFoundException si la orden no existe
-     * @throws InvalidOrderOperationException si la transición de estado no es
-     * válida
+     * @throws InvalidOrderOperationException si la transición de estado no es válida
      */
     public PurchaseOrder updateOrderStatus(Long orderId, UpdateOrderStatusRequest request) {
         logger.info("Actualizando estado de orden ID: {} a {}", orderId, request.getStatus());
 
-        PurchaseOrder order = purchaseOrderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
+        PurchaseOrder order =
+                purchaseOrderRepository
+                        .findById(orderId)
+                        .orElseThrow(() -> new OrderNotFoundException(orderId));
 
         // Validar transición de estado
         validateStatusTransition(order.getStatus(), request.getStatus());
@@ -247,8 +257,10 @@ public class OrderService {
         // Agregar notas si se proporcionan
         if (request.getNotes() != null && !request.getNotes().trim().isEmpty()) {
             String existingNotes = order.getNotes() != null ? order.getNotes() : "";
-            String newNotes = existingNotes.isEmpty() ? request.getNotes()
-                    : existingNotes + "\n" + request.getNotes();
+            String newNotes =
+                    existingNotes.isEmpty()
+                            ? request.getNotes()
+                            : existingNotes + "\n" + request.getNotes();
             order.setNotes(newNotes);
         }
 
@@ -258,45 +270,52 @@ public class OrderService {
         }
 
         order = purchaseOrderRepository.save(order);
-        logger.info("Estado de orden actualizado exitosamente: {} -> {}",
-                order.getOrderNumber(), order.getStatus());
+        logger.info(
+                "Estado de orden actualizado exitosamente: {} -> {}",
+                order.getOrderNumber(),
+                order.getStatus());
         return order;
     }
 
     // ========== Order Reception ==========
     /**
-     * Registra la recepción de productos de una orden de compra.
-     * Requerimientos: - 3.2: Registrar la recepción parcial o total de
-     * productos de una orden de compra - 3.3: Incrementar el stock de los
-     * productos recibidos cuando se registre una recepción
+     * Registra la recepción de productos de una orden de compra. Requerimientos: - 3.2: Registrar
+     * la recepción parcial o total de productos de una orden de compra - 3.3: Incrementar el stock
+     * de los productos recibidos cuando se registre una recepción
      *
      * @param orderId ID de la orden
      * @param request Datos de la recepción
      * @return Respuesta con detalles de la recepción
      * @throws OrderNotFoundException si la orden no existe
-     * @throws InvalidOrderOperationException si la orden no puede recibir
-     * productos
+     * @throws InvalidOrderOperationException si la orden no puede recibir productos
      */
     public OrderReceiptResponse receiveOrder(Long orderId, ReceiveOrderRequest request) {
         logger.info("Procesando recepción de orden ID: {}", orderId);
 
-        PurchaseOrder order = purchaseOrderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
+        PurchaseOrder order =
+                purchaseOrderRepository
+                        .findById(orderId)
+                        .orElseThrow(() -> new OrderNotFoundException(orderId));
 
         // Validar que la orden puede recibir productos
         validateOrderCanReceiveProducts(order);
 
         // Establecer fecha de recepción si no se proporciona
-        LocalDate receivedDate = request.getReceivedDate() != null
-                ? request.getReceivedDate() : LocalDate.now();
+        LocalDate receivedDate =
+                request.getReceivedDate() != null ? request.getReceivedDate() : LocalDate.now();
 
         List<OrderDetailReceiptResponse> receiptDetails = new ArrayList<>();
 
         // Procesar cada detalle de recepción
         for (OrderDetailReceiptRequest receiptRequest : request.getReceivedDetails()) {
-            OrderDetail orderDetail = orderDetailRepository.findById(receiptRequest.getOrderDetailId())
-                    .orElseThrow(() -> new InvalidOrderOperationException(
-                    "Detalle de orden no encontrado: " + receiptRequest.getOrderDetailId()));
+            OrderDetail orderDetail =
+                    orderDetailRepository
+                            .findById(receiptRequest.getOrderDetailId())
+                            .orElseThrow(
+                                    () ->
+                                            new InvalidOrderOperationException(
+                                                    "Detalle de orden no encontrado: "
+                                                            + receiptRequest.getOrderDetailId()));
 
             // Validar que el detalle pertenece a la orden
             if (!orderDetail.getOrder().getId().equals(orderId)) {
@@ -310,8 +329,11 @@ public class OrderService {
 
             if (quantityToReceive > quantityPending) {
                 throw new InvalidOrderOperationException(
-                        String.format("Cantidad a recibir (%d) excede la cantidad pendiente (%d) para el producto %s",
-                                quantityToReceive, quantityPending, orderDetail.getProduct().getCode()));
+                        String.format(
+                                "Cantidad a recibir (%d) excede la cantidad pendiente (%d) para el producto %s",
+                                quantityToReceive,
+                                quantityPending,
+                                orderDetail.getProduct().getCode()));
             }
 
             if (quantityToReceive > 0) {
@@ -328,26 +350,29 @@ public class OrderService {
                 productRepository.save(product);
 
                 // Crear movimiento de inventario
-                createInventoryMovementForReceipt(product, quantityToReceive, order.getId(),
-                        request.getNotes());
+                createInventoryMovementForReceipt(
+                        product, quantityToReceive, order.getId(), request.getNotes());
 
                 // Crear respuesta del detalle
-                OrderDetailReceiptResponse detailResponse = new OrderDetailReceiptResponse(
-                        orderDetail.getId(),
-                        product.getId(),
-                        product.getCode(),
-                        product.getName(),
-                        orderDetail.getQuantityOrdered(),
-                        previouslyReceived,
-                        quantityToReceive,
-                        orderDetail.getQuantityReceived(),
-                        orderDetail.getQuantityPending(),
-                        orderDetail.isFullyReceived()
-                );
+                OrderDetailReceiptResponse detailResponse =
+                        new OrderDetailReceiptResponse(
+                                orderDetail.getId(),
+                                product.getId(),
+                                product.getCode(),
+                                product.getName(),
+                                orderDetail.getQuantityOrdered(),
+                                previouslyReceived,
+                                quantityToReceive,
+                                orderDetail.getQuantityReceived(),
+                                orderDetail.getQuantityPending(),
+                                orderDetail.isFullyReceived());
                 receiptDetails.add(detailResponse);
 
-                logger.info("Recibido producto {} - Cantidad: {}, Stock actualizado: {}",
-                        product.getCode(), quantityToReceive, product.getCurrentStock());
+                logger.info(
+                        "Recibido producto {} - Cantidad: {}, Stock actualizado: {}",
+                        product.getCode(),
+                        quantityToReceive,
+                        product.getCurrentStock());
             }
         }
 
@@ -355,26 +380,27 @@ public class OrderService {
         updateOrderStatusAfterReceipt(order, receivedDate);
 
         // Crear respuesta
-        OrderReceiptResponse response = OrderReceiptResponse.success(
-                order.getId(),
-                order.getOrderNumber(),
-                order.getStatus(),
-                receivedDate,
-                request.getNotes(),
-                receiptDetails,
-                order.isFullyReceived()
-        );
+        OrderReceiptResponse response =
+                OrderReceiptResponse.success(
+                        order.getId(),
+                        order.getOrderNumber(),
+                        order.getStatus(),
+                        receivedDate,
+                        request.getNotes(),
+                        receiptDetails,
+                        order.isFullyReceived());
 
-        logger.info("Recepción de orden procesada exitosamente: {} - Estado: {}",
-                order.getOrderNumber(), order.getStatus());
+        logger.info(
+                "Recepción de orden procesada exitosamente: {} - Estado: {}",
+                order.getOrderNumber(),
+                order.getStatus());
         return response;
     }
 
     // ========== Query Methods ==========
     /**
-     * Obtiene órdenes vencidas (que han pasado su fecha esperada).
-     * Requerimiento 3.5: Generar alertas cuando una orden de compra exceda la
-     * fecha esperada de entrega.
+     * Obtiene órdenes vencidas (que han pasado su fecha esperada). Requerimiento 3.5: Generar
+     * alertas cuando una orden de compra exceda la fecha esperada de entrega.
      *
      * @return Lista de órdenes vencidas
      */
@@ -408,9 +434,7 @@ public class OrderService {
     }
 
     // ========== Helper Methods ==========
-    /**
-     * Obtiene el usuario actual del contexto de seguridad.
-     */
+    /** Obtiene el usuario actual del contexto de seguridad. */
     private User getCurrentUser() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -424,9 +448,7 @@ public class OrderService {
         return null;
     }
 
-    /**
-     * Valida que la transición de estado sea válida.
-     */
+    /** Valida que la transición de estado sea válida. */
     private void validateStatusTransition(OrderStatus currentStatus, OrderStatus newStatus) {
         // Reglas de transición de estado
         switch (currentStatus) {
@@ -437,7 +459,8 @@ public class OrderService {
                 }
                 break;
             case CONFIRMED:
-                if (newStatus != OrderStatus.PARTIAL && newStatus != OrderStatus.COMPLETED
+                if (newStatus != OrderStatus.PARTIAL
+                        && newStatus != OrderStatus.COMPLETED
                         && newStatus != OrderStatus.CANCELLED) {
                     throw new InvalidOrderOperationException(
                             "Transición de estado inválida: " + currentStatus + " -> " + newStatus);
@@ -452,28 +475,27 @@ public class OrderService {
             case COMPLETED:
             case CANCELLED:
                 throw new InvalidOrderOperationException(
-                        "No se puede cambiar el estado de una orden " + currentStatus.name().toLowerCase());
+                        "No se puede cambiar el estado de una orden "
+                                + currentStatus.name().toLowerCase());
         }
     }
 
-    /**
-     * Valida que una orden puede recibir productos.
-     */
+    /** Valida que una orden puede recibir productos. */
     private void validateOrderCanReceiveProducts(PurchaseOrder order) {
         if (order.getStatus() == OrderStatus.CANCELLED) {
-            throw new InvalidOrderOperationException("No se pueden recibir productos de una orden cancelada");
+            throw new InvalidOrderOperationException(
+                    "No se pueden recibir productos de una orden cancelada");
         }
         if (order.getStatus() == OrderStatus.COMPLETED) {
             throw new InvalidOrderOperationException("La orden ya está completada");
         }
         if (order.getStatus() == OrderStatus.PENDING) {
-            throw new InvalidOrderOperationException("La orden debe estar confirmada antes de recibir productos");
+            throw new InvalidOrderOperationException(
+                    "La orden debe estar confirmada antes de recibir productos");
         }
     }
 
-    /**
-     * Actualiza el estado de la orden después de una recepción.
-     */
+    /** Actualiza el estado de la orden después de una recepción. */
     private void updateOrderStatusAfterReceipt(PurchaseOrder order, LocalDate receivedDate) {
         // Actualizar fecha de recepción
         if (order.getReceivedDate() == null) {
@@ -490,11 +512,9 @@ public class OrderService {
         purchaseOrderRepository.save(order);
     }
 
-    /**
-     * Crea un movimiento de inventario para una recepción.
-     */
-    private void createInventoryMovementForReceipt(Product product, Integer quantity,
-            Long orderId, String notes) {
+    /** Crea un movimiento de inventario para una recepción. */
+    private void createInventoryMovementForReceipt(
+            Product product, Integer quantity, Long orderId, String notes) {
         InventoryMovement movement = new InventoryMovement();
         movement.setProduct(product);
         movement.setMovementType(InventoryMovement.MovementType.IN);

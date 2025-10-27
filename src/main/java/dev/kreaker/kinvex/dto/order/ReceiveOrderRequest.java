@@ -7,9 +7,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * DTO para registrar la recepción de productos de una orden de compra.
- * Implementa el requerimiento 3.2: Registrar la recepción parcial o total de
- * productos de una orden de compra.
+ * DTO para registrar la recepción de productos de una orden de compra. Implementa el requerimiento
+ * 3.2: Registrar la recepción parcial o total de productos de una orden de compra.
  */
 public class ReceiveOrderRequest {
 
@@ -23,8 +22,7 @@ public class ReceiveOrderRequest {
     private List<OrderDetailReceiptRequest> receivedDetails;
 
     // Default constructor
-    public ReceiveOrderRequest() {
-    }
+    public ReceiveOrderRequest() {}
 
     // Constructor with required fields
     public ReceiveOrderRequest(List<OrderDetailReceiptRequest> receivedDetails) {
@@ -33,7 +31,8 @@ public class ReceiveOrderRequest {
     }
 
     // Constructor with all fields
-    public ReceiveOrderRequest(LocalDate receivedDate, String notes, List<OrderDetailReceiptRequest> receivedDetails) {
+    public ReceiveOrderRequest(
+            LocalDate receivedDate, String notes, List<OrderDetailReceiptRequest> receivedDetails) {
         this.receivedDate = receivedDate;
         this.notes = notes;
         this.receivedDetails = receivedDetails;
@@ -67,9 +66,13 @@ public class ReceiveOrderRequest {
     @Override
     public String toString() {
         return "ReceiveOrderRequest{"
-                + "receivedDate=" + receivedDate
-                + ", notes='" + notes + '\''
-                + ", receivedDetails=" + receivedDetails
+                + "receivedDate="
+                + receivedDate
+                + ", notes='"
+                + notes
+                + '\''
+                + ", receivedDetails="
+                + receivedDetails
                 + '}';
     }
 }
